@@ -2,12 +2,21 @@
 import './main.html';
 import { Meteor } from 'meteor/meteor';
 import { Renderer } from './renderer';
+import { Control } from './control';
 import _ from 'lodash';
 
 
 Meteor.startup(() => {
   var canvas = document.getElementById('canvas');
   var renderer = new Renderer(canvas);
-  renderer.draw();
+  var control = new Control(renderer.camera);
+
+  function raf() {
+    renderer.draw();
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+  control.addListeners();
 });
+
 
