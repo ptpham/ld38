@@ -13,6 +13,7 @@
     "meteor-node-stubs": "~0.2.4",
     "ml-floyd-warshall": "^1.0.0",
     "ml-matrix": "^2.3.0",
-    "union-find": "^1.0.2"
+    "union-find": "^1.0.2",
+    "webgl-obj-loader": "^0.1.1"
   }
 }
