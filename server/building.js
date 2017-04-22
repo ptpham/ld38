@@ -4,8 +4,6 @@ import { getGameId } from '../common/games';
 import HexGrid from '../common/hexgrid';
 import { addRoadToCostMatrix } from './pathing';
 
-let roadIndex = 0;
-
 export function makeTile({
   x,
   y,
@@ -30,6 +28,7 @@ export function build({
   return makeTile({ x, y, type, paths, index });
 }
 
+let roadIndex = 0;
 export function buildRoad(x, y) {
   const gameId = getGameId();
   let maxAdjacentRoads = false;
