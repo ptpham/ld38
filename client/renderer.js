@@ -10,8 +10,8 @@ import _ from 'lodash';
 var _v3_0 = vec3.create();
 const RADIUS = 1;
 const RADIUS_COS30 = RADIUS*Math.cos(Math.PI/6);
-var ROAD_SCALE = 0.4;
-var matRoadScale = mat4.fromScaling(mat4.create(), _.times(3, () => ROAD_SCALE));
+var ROAD_SCALE = 0.3;
+var ROAD_SCALING = _.times(3, () => ROAD_SCALE);
 
 function resizeCanvas(gl, canvas) {
   canvas.width = document.body.offsetWidth;
@@ -93,14 +93,16 @@ export class Renderer {
     shader.uniforms.color = [0.5, 0.5, 0.5, 1];
     Tiles.find().forEach(tile => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
-      shader.uniforms.world = mat4.translate(this.world, matRoadScale, _v3_0);
+      var world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
       disk.draw(gl.TRIANGLES);
     });
 
     rect.bind(shader);
     Tiles.find().forEach(tile => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
-      shader.uniforms.world = mat4.translate(this.world, matRoadScale, _v3_0);
+      var world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
       rect.draw(gl.TRIANGLES);
     });
   }
