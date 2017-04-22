@@ -35,7 +35,7 @@ export function buildRoad(x, y) {
 
   const index = roadIndex++;
   adjacentTiles.forEach(tile => {
-    build({ x: tile.x, y: tile.y, type: tile.type, paths: tile.paths + 1 });
+    build({ x: tile.x, y: tile.y, paths: tile.paths + 1, type: tile.type, index: tile.index });
   });
   addRoadToCostMatrix(index);
   return build({ x, y, type: ROAD, paths, index });
@@ -53,6 +53,7 @@ export function generateMap(width, height) {
   const possibleTypes = [TREE, ROCK, AQUA, NONE];
   for (let i = 0; i < height; i++) {
     for (let j = 0; j < width; j++) {
+      if (i + j === 0 || i + j === height + width - 2) continue;
       makeTile({ x: j, y: i, type: _.sample(possibleTypes) });
     }
   }

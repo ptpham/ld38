@@ -6,7 +6,7 @@ import { Tiles, ROAD } from '../common/tiles';
 import { getGameId } from '../common/games';
 
 export const pathing = {
-  // cost matrix, assuming starting with 1 road
+  // cost matrix
   cMatrix: Matrix.ones(1, 1),
   // adjacency matrix
   aMatrix: null,
@@ -15,10 +15,10 @@ export const pathing = {
 };
 
 export function addRoadToCostMatrix(index) {
-  if (index === 0) return; // already have first row/col
+  if (index === 0) return; // skip first row / col
   const cMatrix = pathing.cMatrix;
-  cMatrix.addColumn(index, _.times(cMatrix.nRows, () => 1));
-  cMatrix.addRow(index, _.times(cMatrix.nCols, () => 1));
+  cMatrix.addColumn(index, Matrix.rowVector(_.times(cMatrix.rows, () => 1)));
+  cMatrix.addRow(index, Matrix.rowVector(_.times(cMatrix.columns, () => 1)));
 }
 
 export function getRoad(query = {}) {

@@ -7,8 +7,11 @@ Meteor.startup(() => {
   // code to run on server at startup
   const gameId = newGame();
   generateMap(4, 4);
+  buildRoad(0, 1);
+  buildRoad(1, 1);
+  buildRoad(1, 2);
+  buildRoad(2, 2);
 
-  console.log(Tiles.find({ gameId }).fetch());
   Meteor.publish('tiles', () => Tiles.find({ gameId }));
   Meteor.methods({
     buildWork,
