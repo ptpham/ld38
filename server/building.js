@@ -3,6 +3,7 @@ import { Tiles, TREE, ROCK, AQUA, NONE, WORK, HOME, ROAD } from '../common/tiles
 import { getGameId } from '../common/games';
 import HexGrid from '../common/hexgrid';
 import { addRoadToCostMatrix } from './pathing';
+import { createLight } from './lighting';
 
 export function build({ x, y, type, paths = null, index = null }) {
   const gameId = getGameId();
@@ -13,26 +14,37 @@ let roadIndex = 0;
 export function buildRoad(x, y) {
   const gameId = getGameId();
   let maxAdjacentRoads = false;
-  let paths = 0;
+  let paths = [];
   let adjacentTiles = [];
   HexGrid.adjacent(null, x, y)
     .forEach(([ax, ay]) => {
       const tile = Tiles.findOne({ x: ax, y: ay, type: ROAD, gameId });
       if (tile) {
         adjacentTiles.push(tile);
-        paths += 1;
-        maxAdjacentRoads = maxAdjacentRoads || tile.paths >= 3;
+        paths.push(tile._id);
+        maxAdjacentRoads = maxAdjacentRoads || tile.paths.length >= 3;
       }
     });
-  if (maxAdjacentRoads || paths > 3) return;
+  if (maxAdjacentRoads || paths.length > 3) return;
 
   const index = roadIndex;
-  const newRoad = build({ x, y, type: ROAD, paths, index });
+  build({ x, y, type: ROAD, paths, index });
+
+  const newRoad = Tiles.findOne({ x, y, type: ROAD, gameId });
   if (newRoad) {
     roadIndex += 1;
     addRoadToCostMatrix(index);
     adjacentTiles.forEach(tile => {
-      build({ x: tile.x, y: tile.y, paths: tile.paths + 1, type: tile.type, index: tile.index });
+      tile.paths.push(newRoad._id);
+      const adjId = build({
+        x: tile.x,
+        y: tile.y,
+        type: tile.type,
+        index: tile.index,
+        paths: tile.paths
+      });
+
+      if (tile.paths.length === 3) createLight({ tileId: adjId, open: [0, 1] });
     });
   }
 

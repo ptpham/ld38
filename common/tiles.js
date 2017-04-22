@@ -1,4 +1,6 @@
+import _ from 'lodash';
 import { Mongo } from 'meteor/mongo';
+import HexGrid from './hexgrid';
 
 export const Tiles = new Mongo.Collection('tiles');
 

@@ -7,6 +7,7 @@ import _ from 'lodash';
 
 Meteor.startup(() => {
   Meteor.subscribe('tiles');
+  Meteor.subscribe('lights');
   var canvas = document.getElementById('canvas');
   var renderer = new Renderer(canvas);
   var control = new Control(renderer);

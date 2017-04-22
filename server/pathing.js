@@ -1,8 +1,7 @@
 import _ from 'lodash';
 import Matrix from 'ml-matrix';
 import floydWarshall from 'ml-floyd-warshall';
-import HexGrid from '../common/hexgrid';
-import { Tiles, ROAD } from '../common/tiles';
+import { Tiles, ROAD, getAdjacentTiles } from '../common/tiles';
 import { getGameId } from '../common/games';
 
 export const pathing = {
@@ -34,24 +33,12 @@ export function getRoads(query = {}) {
   );
 }
 
-export function getAllSegments() {
-  return getRoads({ paths: 2 });
-}
-
-export function getAllIntersections() {
-  return getRoads({ paths: { $in: [1, 3] } });
-}
-
 export function findDistances() {
   const tiles = getRoads().fetch();
   const aMatrix = Matrix.zeros(tiles.length, tiles.length);
-  getRoads().forEach((tile) => {
+  tiles.forEach((tile) => {
     const i = tile.index;
-    const adjRoads = _.chain(HexGrid.adjacent(null, tile.x, tile.y))
-      .map(([ax, ay]) => getRoad({ x: ax, y: ay }))
-      .compact()
-      .value();
-
+    const adjRoads = tile.paths.map(id => Tiles.findOne(id));
     aMatrix.set(i, i, pathing.cMatrix.get(i, i));
     adjRoads.forEach((tile) => {
       const ai = tile.index;
@@ -81,6 +68,5 @@ export function findNextTile(x, y, x2, y2) {
     }
   }
 
-  const gameId = getGameId();
-  return getRoad({ gameId, index: next });
+  return getRoad({ index: next });
 }
