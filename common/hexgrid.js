@@ -1,5 +1,6 @@
 
 import { vec2, mat2 } from 'gl-matrix';
+import _ from 'lodash';
 
 var shifts = [[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]]
   .map(x => vec2.fromValues(x[0], x[1]));
@@ -10,11 +11,12 @@ var sec30 = 1/Math.cos(Math.PI/6);
 var tan30 = Math.tan(Math.PI/6);
 var _adjacents = shifts.map(x => vec2.create());
 
-export class HexGrid {
-  constructor(scale, di) {
-    this.scale = scale;
+export default class HexGrid {
+  constructor(di) {
+    this.scale = vec2.length(di);
     this.di = vec2.clone(di);
-    this.dj = HexGrid.rotate(vec2.create(), di);
+    vec2.normalize(this.di, this.di);
+    this.dj = HexGrid.rotate(vec2.create(), this.di);
   }
 
   center(result, i, j) {
