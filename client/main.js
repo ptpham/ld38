@@ -10,7 +10,6 @@ import { Tiles } from '../common/tiles';
 
 Meteor.startup(() => {
   Tracker.autorun(() => {
-    Meteor.subscribe('tiles');
     console.log(Tiles.find().fetch());
   });
 
