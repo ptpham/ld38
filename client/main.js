@@ -1,6 +1,7 @@
 
 import './main.html';
 import { Meteor } from 'meteor/meteor';
+import { Tracker } from 'meteor/tracker';
 import { Renderer } from './renderer';
 import { Control } from './control';
 import _ from 'lodash';
@@ -8,8 +9,10 @@ import _ from 'lodash';
 import { Tiles } from '../common/tiles';
 
 Meteor.startup(() => {
-  Meteor.subscribe('tiles');
-  console.log(Tiles.find().fetch());
+  Tracker.autorun(() => {
+    Meteor.subscribe('tiles');
+    console.log(Tiles.find().fetch());
+  });
 
   var canvas = document.getElementById('canvas');
   var renderer = new Renderer(canvas);
@@ -22,4 +25,3 @@ Meteor.startup(() => {
   requestAnimationFrame(raf);
   control.addListeners();
 });
-
