@@ -1,9 +1,11 @@
-import { Mongo } from 'meteor/mongo';
+import { Meteor } from 'meteor/meteor';
+//import { Mongo } from 'meteor/mongo';
 import _ from 'lodash';
 import HexGrid from './hexgrid';
 
-const Tiles = new Mongo.Collection('tiles');
-export default Tiles;
+// const Tiles = new Mongo.Collection('tiles');
+const tiles = [];
+export default tiles;
 
 export const ROAD = 'ROAD';
 export const HOME = 'HOME';
@@ -13,17 +15,68 @@ export const ROCK = 'ROCK';
 export const AQUA = 'AQUA';
 export const NONE = 'NONE';
 
+export function persist() {
+  // TODO: persist to DB
+}
+
 export function makeTile(x, y, type) {
-  Tiles.insert({ x, y, type });
+  tiles[x] = tiles[x] || [];
+  tiles[x][y] = { x, y, type };
 }
 
-export function isIntersection(x, y) {
-  const tile = Tiles.findOne({ x, y });
-  if (tile.type !== ROAD) return false;
-
-  const adjacents = HexGrid.adjacent(null, x, y);
-  const adjacentTiles = adjacents
-    .map(([ax, ay]) => Tiles.findOne({ x: ax, y: ay, type: ROAD }));
-  const adjacentRoads = _.compact(adjacentTiles);
-  return adjacentRoads > 2;
+export function generate(width, height) {
+  const possibleTypes = [TREE, ROCK, AQUA, NONE];
+  for (let i = 0; i < height; i++) {
+    for (let j = 0; j < width; j++) {
+      makeTile(j, i, _.sample(possibleTypes));
+    }
+  }
+  return tiles;
 }
+
+export function build(x, y, type) {
+  const tile = tiles[x][y];
+  if (tile.type === AQUA || tile.type === ROCK) return;
+  tile.type = type;
+  return tile;
+}
+
+export function buildRoad(x, y) {
+  let maxAdjacentRoads = false;
+  let paths = 0;
+  const adjacents = HexGrid.adjacent(null, x, y)
+    .forEach(([ax, ay]) => {
+      const tile = tiles[ax][ay];
+      if (tile.type === ROAD) {
+        paths += 1;
+        maxAdjacentRoads = maxAdjacentRoads || tile.paths >= 3;
+      }
+    });
+  if (maxAdjacentRoads || paths > 3) return;
+
+  adjacents.forEach(tile => { tile.paths += 1; });
+  const tile = build(x, y, ROAD);
+  tile.paths = paths;
+  return tile;
+}
+
+export function buildHome(x, y) {
+  return build(x, y, HOME);
+}
+
+export function buildWork(x, y) {
+  return build(x, y, WORK);
+}
+
+export function getAllIntersections() {
+  const flatTiles = _.flatten(tiles);
+  return _.filter(flatTiles,
+    tile => (tile.type === ROAD && (tile.paths === 3 || tile.paths === 1))
+  );
+}
+
+Meteor.methods({
+  buildRoad,
+  buildHome,
+  buildWork
+});
