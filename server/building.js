@@ -4,32 +4,19 @@ import { getGameId } from '../common/games';
 import HexGrid from '../common/hexgrid';
 import { addRoadToCostMatrix } from './pathing';
 
-let roadIndex = 0;
-
-export function makeTile({
-  x,
-  y,
-  type,
-  paths = null,
-  index = null
-}) {
+export function makeTile({ x, y, type, paths = null, index = null }) {
   const gameId = getGameId();
   return Tiles.upsert({ x, y, gameId }, { $set: { type, paths, index } });
 }
 
-export function build({
-  x,
-  y,
-  type,
-  paths,
-  index
-}) {
+export function build({ x, y, type, paths, index }) {
   const gameId = getGameId();
   const tile = Tiles.findOne({ x, y, gameId });
   if (tile.type === AQUA || tile.type === ROCK) return;
   return makeTile({ x, y, type, paths, index });
 }
 
+let roadIndex = 0;
 export function buildRoad(x, y) {
   const gameId = getGameId();
   let maxAdjacentRoads = false;
@@ -48,7 +35,7 @@ export function buildRoad(x, y) {
 
   const index = roadIndex++;
   adjacentTiles.forEach(tile => {
-    build({ x: tile.x, y: tile.y, type: tile.type, paths: tile.paths + 1 });
+    build({ x: tile.x, y: tile.y, paths: tile.paths + 1, type: tile.type, index: tile.index });
   });
   addRoadToCostMatrix(index);
   return build({ x, y, type: ROAD, paths, index });
@@ -66,7 +53,8 @@ export function generateMap(width, height) {
   const possibleTypes = [TREE, ROCK, AQUA, NONE];
   for (let i = 0; i < height; i++) {
     for (let j = 0; j < width; j++) {
-      makeTile(j, i, _.sample(possibleTypes));
+      if (i + j === 0 || i + j === height + width - 2) continue;
+      makeTile({ x: j, y: i, type: _.sample(possibleTypes) });
     }
   }
   return Tiles;
