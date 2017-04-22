@@ -8,7 +8,10 @@ var _v2_0 = vec2.create();
 export class HexGrid {
   static adjacent(i, j) {
     vec2.set(_v2_0, i, j);
-    return shifts.map(x => vec2.add(vec2.clone(x), _v2_0, _v2_0));
+    return shifts.map(x => {
+      var result = vec2.clone(x);
+      return vec2.add(result, result, _v2_0);
+    });
   }
 }
 
