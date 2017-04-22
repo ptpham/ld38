@@ -9,6 +9,9 @@ export const ROAD = 'ROAD';
 export const HOME = 'HOME';
 export const WORK = 'WORK';
 export const TREE = 'TREE';
+export const ROCK = 'ROCK';
+export const AQUA = 'AQUA';
+export const NONE = 'NONE';
 
 export function makeTile(x, y, type) {
   Tiles.insert({ x, y, type });
