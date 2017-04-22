@@ -4,6 +4,7 @@ import { Tiles } from '../common/tiles';
 import { Lights } from '../common/lights';
 
 import { generateMap, buildRoad, buildHome, buildWork } from './building';
+import { switchLight } from './lighting';
 import { findDistances } from './pathing';
 
 Meteor.startup(() => {
@@ -16,7 +17,8 @@ Meteor.startup(() => {
   Meteor.methods({
     buildWork,
     buildHome,
-    buildRoad
+    buildRoad,
+    switchLight
   });
   Meteor.setInterval(() => {
     findDistances();

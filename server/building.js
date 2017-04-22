@@ -36,7 +36,7 @@ export function buildRoad(x, y) {
     addRoadToCostMatrix(index);
     adjacentTiles.forEach(tile => {
       tile.paths.push(newRoad._id);
-      const adjId = build({
+      build({
         x: tile.x,
         y: tile.y,
         type: tile.type,
@@ -44,7 +44,7 @@ export function buildRoad(x, y) {
         paths: tile.paths
       });
 
-      if (tile.paths.length === 3) createLight({ tileId: adjId, open: [0, 1] });
+      if (tile.paths.length === 3) createLight({ x, y, open: [0, 1] });
     });
   }
 
