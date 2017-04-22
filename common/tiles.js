@@ -2,9 +2,9 @@ import { Mongo } from 'meteor/mongo';
 import _ from 'lodash';
 import HexGrid from './hexgrid';
 
-const Tiles = new Mongo.Collection('tiles');
+// const Tiles = new Mongo.Collection('tiles');
 const tiles = [];
-export default Tiles;
+export default tiles;
 
 export const ROAD = 'ROAD';
 export const HOME = 'HOME';
