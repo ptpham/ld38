@@ -8,9 +8,6 @@ import _ from 'lodash';
 import { Tiles } from '../common/tiles';
 
 Meteor.startup(() => {
-  Meteor.subscribe('tiles');
-  console.log(Tiles.find().fetch());
-
   var canvas = document.getElementById('canvas');
   var renderer = new Renderer(canvas);
   var control = new Control(renderer.camera);
@@ -22,4 +19,3 @@ Meteor.startup(() => {
   requestAnimationFrame(raf);
   control.addListeners();
 });
-
