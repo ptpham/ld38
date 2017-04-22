@@ -3,7 +3,7 @@ import { flatShader } from './shaders';
 import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
 import { vec3, mat4 } from 'gl-matrix';
-import { Tiles } from '../common/tiles';
+import { Tiles, ROAD } from '../common/tiles';
 import HexGrid from '../common/hexgrid';
 import { Mesh } from 'webgl-obj-loader';
 import carGeometry from './geometry/car';
@@ -97,7 +97,7 @@ export class Renderer {
     // Render road centers
     disk.bind(shader);
     shader.uniforms.color = [0.5, 0.5, 0.5, 1];
-    Tiles.find().forEach(tile => {
+    Tiles.find({ type: ROAD }).forEach(tile => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
@@ -105,7 +105,7 @@ export class Renderer {
     });
 
     rect.bind(shader);
-    Tiles.find().forEach(tile => {
+    Tiles.find({ type: ROAD }).forEach(tile => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);

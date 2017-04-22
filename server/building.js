@@ -4,16 +4,9 @@ import { getGameId } from '../common/games';
 import HexGrid from '../common/hexgrid';
 import { addRoadToCostMatrix } from './pathing';
 
-export function makeTile({ x, y, type, paths = null, index = null }) {
+export function build({ x, y, type, paths = null, index = null }) {
   const gameId = getGameId();
   return Tiles.upsert({ x, y, gameId }, { $set: { type, paths, index } });
-}
-
-export function build({ x, y, type, paths, index }) {
-  const gameId = getGameId();
-  const tile = Tiles.findOne({ x, y, gameId });
-  if (tile.type === AQUA || tile.type === ROCK) return;
-  return makeTile({ x, y, type, paths, index });
 }
 
 let roadIndex = 0;
@@ -33,12 +26,17 @@ export function buildRoad(x, y) {
     });
   if (maxAdjacentRoads || paths > 3) return;
 
-  const index = roadIndex++;
-  adjacentTiles.forEach(tile => {
-    build({ x: tile.x, y: tile.y, paths: tile.paths + 1, type: tile.type, index: tile.index });
-  });
-  addRoadToCostMatrix(index);
-  return build({ x, y, type: ROAD, paths, index });
+  const index = roadIndex;
+  const newRoad = build({ x, y, type: ROAD, paths, index });
+  if (newRoad) {
+    roadIndex += 1;
+    addRoadToCostMatrix(index);
+    adjacentTiles.forEach(tile => {
+      build({ x: tile.x, y: tile.y, paths: tile.paths + 1, type: tile.type, index: tile.index });
+    });
+  }
+
+  return newRoad;
 }
 
 export function buildHome(x, y) {
@@ -54,8 +52,17 @@ export function generateMap(width, height) {
   for (let i = 0; i < height; i++) {
     for (let j = 0; j < width; j++) {
       if (i + j === 0 || i + j === height + width - 2) continue;
-      makeTile({ x: j, y: i, type: _.sample(possibleTypes) });
+      build({ x: j, y: i, type: _.sample(possibleTypes) });
     }
+  }
+
+  // generate roads
+  const center = [Math.ceil(width / 2) - 1, Math.ceil(height / 2) - 1];
+  buildRoad(center[0], center[1]);
+  if (width > 5 && height > 5) {
+    buildRoad(center[0] + 1, center[1]);
+    buildRoad(center[0], center[1] - 1);
+    buildRoad(center[0] - 1, center[1] + 1);
   }
   return Tiles;
 }
