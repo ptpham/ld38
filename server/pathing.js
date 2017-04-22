@@ -45,14 +45,14 @@ export function getAllIntersections() {
 export function findDistances() {
   const tiles = getRoads().fetch();
   const aMatrix = Matrix.zeros(tiles.length, tiles.length);
-  tiles.forEach((tile) => {
+  getRoads().forEach((tile) => {
     const i = tile.index;
-    const adjRoads = _.chain(HexGrid.adjacents(null, tile.x, tile.y))
+    const adjRoads = _.chain(HexGrid.adjacent(null, tile.x, tile.y))
       .map(([ax, ay]) => getRoad({ x: ax, y: ay }))
       .compact()
       .value();
 
-    aMatrix.set(i, i, pathing.cMatrix[i, i]);
+    aMatrix.set(i, i, pathing.cMatrix.get(i, i));
     adjRoads.forEach((tile) => {
       const ai = tile.index;
       aMatrix.set(i, ai, pathing.cMatrix.get(i, ai));
