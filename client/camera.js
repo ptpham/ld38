@@ -5,13 +5,15 @@ export class Camera {
   constructor(center, theta, phi, radius) {
     radius = radius || 1;
 
-    this._up = vec3.fromValues(0,0,1);
+    this._eye = vec3.create();
     this._center = center || vec3.create();
     this._radius = radius || 1;
     this._theta = theta || 0;
     this._phi = phi || 0;
 
-    this._eye = vec3.create();
+    this._up = vec3.create();
+    this._forward = vec3.create();
+
     this._recompute();
   }
 
@@ -39,6 +41,13 @@ export class Camera {
     vec3.add(this._eye, this._eye, this._center);
     vec3.rotateY(this._eye, this._eye, this._center, -this._phi);
     vec3.rotateZ(this._eye, this._eye, this._center, this._theta);
+
+    var forward = this.forward(this._forward);
+    vec3.normalize(forward, forward);
+
+    vec3.set(this._up, 0,0,1);
+    vec3.cross(this._up, forward, this._up);
+    vec3.cross(this._up, this._up, forward);
   }
 
   view(out) {

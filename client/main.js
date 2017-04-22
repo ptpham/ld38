@@ -9,7 +9,7 @@ Meteor.startup(() => {
   Meteor.subscribe('tiles');
   var canvas = document.getElementById('canvas');
   var renderer = new Renderer(canvas);
-  var control = new Control(renderer.camera);
+  var control = new Control(renderer);
 
   function raf() {
     renderer.draw();
