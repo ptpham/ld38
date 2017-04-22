@@ -1,4 +1,5 @@
-import { Mongo } from 'meteor/mongo';
+import { Meteor } from 'meteor/meteor';
+//import { Mongo } from 'meteor/mongo';
 import _ from 'lodash';
 import HexGrid from './hexgrid';
 
@@ -15,7 +16,7 @@ export const AQUA = 'AQUA';
 export const NONE = 'NONE';
 
 export function persist() {
-  // TODO
+  // TODO: persist to DB
 }
 
 export function makeTile(x, y, type) {
@@ -30,6 +31,7 @@ export function generate(width, height) {
       makeTile(j, i, _.sample(possibleTypes));
     }
   }
+  return tiles;
 }
 
 export function build(x, y, type) {
@@ -72,3 +74,9 @@ export function getAllIntersections() {
     tile => (tile.type === ROAD && (tile.paths === 3 || tile.paths === 1))
   );
 }
+
+Meteor.methods({
+  buildRoad,
+  buildHome,
+  buildWork
+});
