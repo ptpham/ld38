@@ -67,8 +67,8 @@ export function findDistances() {
 
 export function findNextTile(x, y, x2, y2) {
   let next = null;
-  const start = getRoad(x, y).index;
-  const goal = getRoad(x2, y2).index;
+  const start = getRoad({ x, y }).index;
+  const goal = getRoad({ x: x2, y: y2 }).index;
   const min = pathing.dMatrix.get(start, goal);
   if (min === -1) return;
 
