@@ -25,6 +25,15 @@ export class Camera {
     this._phi = Math.min(Math.max(value, -Math.PI/2 + 0.1), Math.PI/2 - 0.1);
   }
 
+  translate(v) {
+    vec3.add(this._center, this._center, v);
+    vec3.add(this._eye, this._eye, v);
+  }
+
+  forward(out) {
+    return vec3.sub(out, this._center, this._eye);
+  }
+
   _recompute() {
     vec3.set(this._eye, this._radius, 0, 0);
     vec3.add(this._eye, this._eye, this._center);
