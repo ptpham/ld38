@@ -3,6 +3,7 @@ import { flatShader } from './shaders';
 import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
 import { vec3, mat4 } from 'gl-matrix';
+import { Tiles } from '../common/tiles';
 import HexGrid from '../common/hexgrid';
 import _ from 'lodash';
 
@@ -51,7 +52,7 @@ export class Renderer {
     var { gl, canvas, shader, camera, hex}  = this;
     resizeCanvas(gl, canvas);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    
+
     var view = camera.view(this.view);
     var projection = mat4.perspective(this.projection,
           Math.PI/4, canvas.width/canvas.height, 1, 100);
@@ -60,16 +61,14 @@ export class Renderer {
     shader.uniforms.view = view;
     shader.uniforms.projection = projection;
 
-    for (var i = 0; i < 5; i++) {
-      for (var j = 0; j < 5; j++) {
-        this.hexgrid.center(_v3_0, i, j);
-        _v3_0[2] = 0;
+    Tiles.find().forEach(tile => {
+      this.hexgrid.center(_v3_0, tile.x, tile.y);
+      _v3_0[2] = 0;
 
-        shader.uniforms.world = mat4.fromTranslation(this.world, _v3_0);
-        shader.uniforms.color = [0.7,0.7,0.7,1];
-        hex.draw(gl.TRIANGLES);
-      }
-    }
+      shader.uniforms.world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.color = [0.7,0.7,0.7,1];
+      hex.draw(gl.TRIANGLES);
+    });
   }
 }
 

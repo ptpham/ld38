@@ -5,8 +5,6 @@ import { Renderer } from './renderer';
 import { Control } from './control';
 import _ from 'lodash';
 
-import { Tiles } from '../common/tiles';
-
 Meteor.startup(() => {
   Meteor.subscribe('tiles');
   var canvas = document.getElementById('canvas');
