@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import Tiles, { generate } from '../common/tiles';
+import { Tiles, generate } from '../common/tiles';
 
 Meteor.startup(() => {
   // code to run on server at startup
