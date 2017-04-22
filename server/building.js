@@ -2,27 +2,32 @@ import _ from 'lodash';
 import { Tiles, TREE, ROCK, AQUA, NONE, WORK, HOME, ROAD } from '../common/tiles';
 import { getGameId } from '../common/games';
 import HexGrid from '../common/hexgrid';
+import { addRoadToCostMatrix } from './pathing';
 
-export function makeTile(x, y, type, paths = null) {
+let roadIndex = 0;
+
+export function makeTile({
+  x,
+  y,
+  type,
+  paths = null,
+  index = null
+}) {
   const gameId = getGameId();
-  return Tiles.upsert({ x, y, gameId }, { $set: { type, paths } });
+  return Tiles.upsert({ x, y, gameId }, { $set: { type, paths, index } });
 }
 
-export function generateMap(width, height) {
-  const possibleTypes = [TREE, ROCK, AQUA, NONE];
-  for (let i = 0; i < height; i++) {
-    for (let j = 0; j < width; j++) {
-      makeTile(j, i, _.sample(possibleTypes));
-    }
-  }
-  return Tiles;
-}
-
-export function build(x, y, type, paths) {
+export function build({
+  x,
+  y,
+  type,
+  paths,
+  index
+}) {
   const gameId = getGameId();
   const tile = Tiles.findOne({ x, y, gameId });
   if (tile.type === AQUA || tile.type === ROCK) return;
-  return makeTile(x, y, type, paths);
+  return makeTile({ x, y, type, paths, index });
 }
 
 export function buildRoad(x, y) {
@@ -41,10 +46,12 @@ export function buildRoad(x, y) {
     });
   if (maxAdjacentRoads || paths > 3) return;
 
+  const index = roadIndex++;
   adjacentTiles.forEach(tile => {
-    build(tile.x, tile.y, tile.type, tile.paths + 1);
+    build({ x: tile.x, y: tile.y, type: tile.type, paths: tile.paths + 1 });
   });
-  return build(x, y, ROAD, paths);
+  addRoadToCostMatrix(index);
+  return build({ x, y, type: ROAD, paths, index });
 }
 
 export function buildHome(x, y) {
@@ -53,4 +60,14 @@ export function buildHome(x, y) {
 
 export function buildWork(x, y) {
   return build(x, y, WORK);
+}
+
+export function generateMap(width, height) {
+  const possibleTypes = [TREE, ROCK, AQUA, NONE];
+  for (let i = 0; i < height; i++) {
+    for (let j = 0; j < width; j++) {
+      makeTile(j, i, _.sample(possibleTypes));
+    }
+  }
+  return Tiles;
 }
