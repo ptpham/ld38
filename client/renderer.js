@@ -47,6 +47,7 @@ export class Renderer {
     this.world = mat4.create();
 
     this.hexgrid = new HexGrid(vec3.fromValues(RADIUS_COS30,0));
+    this.highlight = null;
   }
   draw() {
     var { gl, canvas, shader, camera, hex}  = this;
@@ -65,8 +66,14 @@ export class Renderer {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       _v3_0[2] = 0;
 
+      var color = [0.7,0.7,0.7,1];
+      if (this.highlight != null
+        && this.highlight[0] == tile.x && this.highlight[1] == tile.y) {
+        color[0] = 1;
+      }
+
       shader.uniforms.world = mat4.fromTranslation(this.world, _v3_0);
-      shader.uniforms.color = [0.7,0.7,0.7,1];
+      shader.uniforms.color = color;
       hex.draw(gl.TRIANGLES);
     });
   }
