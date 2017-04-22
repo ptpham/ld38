@@ -55,5 +55,14 @@ export function generateMap(width, height) {
       build({ x: j, y: i, type: _.sample(possibleTypes) });
     }
   }
+
+  // generate roads
+  const center = [Math.ceil(width / 2) - 1, Math.ceil(height / 2) - 1];
+  buildRoad(center[0], center[1]);
+  if (width > 5 && height > 5) {
+    buildRoad(center[0] + 1, center[1]);
+    buildRoad(center[0], center[1] - 1);
+    buildRoad(center[0] - 1, center[1] + 1);
+  }
   return Tiles;
 }
