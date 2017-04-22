@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { Tiles } from '../common/tiles';
 
 Meteor.startup(() => {
+  Meteor.subscribe('tiles');
   var canvas = document.getElementById('canvas');
   var renderer = new Renderer(canvas);
   var control = new Control(renderer.camera);
