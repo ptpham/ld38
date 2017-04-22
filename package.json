@@ -11,6 +11,8 @@
     "gl-shader": "^4.2.1",
     "lodash": "^4.17.4",
     "meteor-node-stubs": "~0.2.4",
-    "ml-floyd-warshall": "^1.0.0"
+    "ml-floyd-warshall": "^1.0.0",
+    "ml-matrix": "^2.3.0",
+    "union-find": "^1.0.2"
   }
 }
