@@ -4,24 +4,12 @@ import { getGameId } from '../common/games';
 import HexGrid from '../common/hexgrid';
 import { addRoadToCostMatrix } from './pathing';
 
-export function makeTile({
-  x,
-  y,
-  type,
-  paths = null,
-  index = null
-}) {
+export function makeTile({ x, y, type, paths = null, index = null }) {
   const gameId = getGameId();
   return Tiles.upsert({ x, y, gameId }, { $set: { type, paths, index } });
 }
 
-export function build({
-  x,
-  y,
-  type,
-  paths,
-  index
-}) {
+export function build({ x, y, type, paths, index }) {
   const gameId = getGameId();
   const tile = Tiles.findOne({ x, y, gameId });
   if (tile.type === AQUA || tile.type === ROCK) return;
@@ -65,7 +53,7 @@ export function generateMap(width, height) {
   const possibleTypes = [TREE, ROCK, AQUA, NONE];
   for (let i = 0; i < height; i++) {
     for (let j = 0; j < width; j++) {
-      makeTile(j, i, _.sample(possibleTypes));
+      makeTile({ x: j, y: i, type: _.sample(possibleTypes) });
     }
   }
   return Tiles;

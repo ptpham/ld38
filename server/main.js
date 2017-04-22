@@ -8,6 +8,7 @@ Meteor.startup(() => {
   const gameId = newGame();
   generateMap(4, 4);
 
+  console.log(Tiles.find({ gameId }).fetch());
   Meteor.publish('tiles', () => Tiles.find({ gameId }));
   Meteor.methods({
     buildWork,
