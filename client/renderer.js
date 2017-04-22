@@ -10,6 +10,8 @@ import _ from 'lodash';
 var _v3_0 = vec3.create();
 const RADIUS = 1;
 const RADIUS_COS30 = RADIUS*Math.cos(Math.PI/6);
+var ROAD_SCALE = 0.3;
+var ROAD_SCALING = _.times(3, () => ROAD_SCALE);
 
 function resizeCanvas(gl, canvas) {
   canvas.width = document.body.offsetWidth;
@@ -18,13 +20,14 @@ function resizeCanvas(gl, canvas) {
   gl.viewport(0, 0, width, height);
 }
 
-function makeHex(gl) {
-  var positions = [vec3.create()].concat(_.times(6, i => {
-    var angle = 2*i*Math.PI/6 + Math.PI/6;
+function makeCircle(gl, sides) {
+  sides = sides || 6;
+  var positions = [vec3.create()].concat(_.times(sides, i => {
+    var angle = 2*i*Math.PI/sides + Math.PI/sides;
     return vec3.fromValues(0.5*Math.cos(angle), 0.5*Math.sin(angle), 0);
   }));
 
-  var cells = _.times(6, i => [0,i+1, (i+1)%6+1]);
+  var cells = _.times(sides, i => [0,i+1, (i+1)%sides+1]);
   return createGeometry(gl).attr('positions', { positions, cells });
 }
 
@@ -40,7 +43,14 @@ export class Renderer {
     this.canvas = canvas;
     this.camera = camera;
     this.shader = flatShader(gl);
-    this.hex = makeHex(gl);
+    this.hex = makeCircle(gl);
+    this.disk = makeCircle(gl, 16);
+    this.rect = createGeometry(gl).attr('positions', {
+      positions: [[0,-0.5,0],[0,0.5,0],
+        [RADIUS_COS30*0.5/ROAD_SCALE,0.5,0],
+        [RADIUS_COS30*0.5/ROAD_SCALE,-0.5,0]],
+      cells: [[0,1,2],[0,2,3]]
+    });
 
     this.view = mat4.create();
     this.projection = mat4.create();
@@ -50,7 +60,7 @@ export class Renderer {
     this.highlight = null;
   }
   draw() {
-    var { gl, canvas, shader, camera, hex}  = this;
+    var { gl, canvas, shader, camera, hex, disk, rect }  = this;
     resizeCanvas(gl, canvas);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -58,15 +68,16 @@ export class Renderer {
     var projection = mat4.perspective(this.projection,
           Math.PI/4, canvas.width/canvas.height, 1, 100);
 
+    // Render hex tiles
     hex.bind(shader);
     shader.uniforms.view = view;
     shader.uniforms.projection = projection;
+    _v3_0[2] = 0;
 
     Tiles.find().forEach(tile => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
-      _v3_0[2] = 0;
 
-      var color = [0.7,0.7,0.7,1];
+      var color = [0.92,0.9,0.9,1];
       if (this.highlight != null
         && this.highlight[0] == tile.x && this.highlight[1] == tile.y) {
         color[0] = 1;
@@ -75,6 +86,24 @@ export class Renderer {
       shader.uniforms.world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.color = color;
       hex.draw(gl.TRIANGLES);
+    });
+
+    // Render road centers
+    disk.bind(shader);
+    shader.uniforms.color = [0.5, 0.5, 0.5, 1];
+    Tiles.find().forEach(tile => {
+      this.hexgrid.center(_v3_0, tile.x, tile.y);
+      var world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
+      disk.draw(gl.TRIANGLES);
+    });
+
+    rect.bind(shader);
+    Tiles.find().forEach(tile => {
+      this.hexgrid.center(_v3_0, tile.x, tile.y);
+      var world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
+      rect.draw(gl.TRIANGLES);
     });
   }
 }
