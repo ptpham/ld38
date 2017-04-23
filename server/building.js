@@ -33,7 +33,11 @@ export function build({ x, y, type }, stop) {
 }
 
 export function buildRoad(x, y) { return build({ x, y, type: ROAD }); }
-export function buildHome(x, y) { return build({ x, y, type: HOME }); }
+export function buildHome(x, y, teamId) {
+  const gameId = getGameId();
+  build({ x, y, type: HOME });
+  Tiles.upsert({ x, y, gameId }, { $set: { teamId } });
+}
 export function buildWork(x, y) { return build({ x, y, type: WORK }); }
 
 export function generateMap(width, height) {
@@ -53,7 +57,7 @@ export function generateMap(width, height) {
     buildRoad(center[0], center[1] - 1);
     buildRoad(center[0] - 1, center[1] + 1);
     buildWork(center[0] + 1, center[1] + 1);
-    buildHome(center[0] - 1, center[1] - 1);
+    buildHome(center[0] - 1, center[1] - 1, 0);
   }
   return Tiles;
 }

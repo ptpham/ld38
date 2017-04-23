@@ -89,14 +89,13 @@ export function simulate() {
   var gameId = getGameId();
   var homeTiles = Tiles.find({ type: HOME, gameId }).fetch();
   var workTiles = Tiles.find({ type: WORK, gameId }).fetch();
-  var teamId = _.sample([0, 1]);
 
   for (var home of homeTiles) {
     if (!Cars.findOne({ gameId, homeTileId: home._id })) {
-      createCar(home, teamId);
+      createCar(home, home.teamId);
     }
 
-    var car = Cars.findOne({ homeTileId: home._id }); 
+    var car = Cars.findOne({ homeTileId: home._id });
     if (car.workTileId == null) assignWork(workTiles, car);
     assignDestination(car);
     moveCar(car, routeCar(car));
