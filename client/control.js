@@ -1,10 +1,14 @@
 
 import { vec3, mat4 } from 'gl-matrix';
 import { Meteor } from 'meteor/meteor';
+import { Tiles, ROAD } from '../common/tiles';
+import { Lights } from '../common/lights';
+import HexGrid from '../common/hexgrid';
 import _ from 'lodash';
 
 var _v3_0 = vec3.create();
 var _v3_1 = vec3.create();
+var _v3_2 = vec3.create();
 var rot90 = mat4.fromZRotation(mat4.create(), Math.PI/2);
 
 export class Control {
@@ -22,7 +26,7 @@ export class Control {
     this.invcam = mat4.create();
   }
 
-  screenToHex(clientX, clientY) {
+  screenToPlane(result, clientX, clientY) {
     var invproj = mat4.invert(this.invproj, this.renderer.projection);
     var invview = mat4.invert(this.invview, this.renderer.view);
     var invcam = mat4.multiply(this.invcam, invview, invproj);
@@ -37,8 +41,15 @@ export class Control {
     var t = -eye[2] / _v3_0[2];
     var x = eye[0] + t*_v3_0[0];
     var y = eye[1] + t*_v3_0[1];
+  
+    result[0] = x;
+    result[1] = y;
+    return result;
+  }
 
-    return this.hexgrid.lookup(_v3_1, x, y);
+  screenToHex(clientX, clientY) {
+    this.screenToPlane(_v3_2, clientX, clientY);
+    return this.hexgrid.lookup(_v3_1, _v3_2[0], _v3_2[1]);
   }
 
   moved() {
@@ -54,7 +65,31 @@ export class Control {
   }
 
   mousemove(e) {
-    this.renderer.highlight = this.screenToHex(e.clientX, e.clientY);
+    var mouseHit = this.screenToPlane(this.renderer.mouseHit, e.clientX, e.clientY);
+    var highlight = this.hexgrid.lookup(this.renderer.highlight,
+      mouseHit[0], mouseHit[1]);
+
+    var light = Lights.findOne({ x: highlight[0], y: highlight[1] });
+    if (light != null) {
+      var tile = Tiles.findOne({ x: highlight[0], y: highlight[1] });
+      var best = Infinity, orientation = null;
+      for (var otherId of tile.paths) {
+        var other = Tiles.findOne({ _id: otherId });
+        var center = this.hexgrid.center(_v3_0, other.x, other.y);
+        var distance = vec3.distance(center, mouseHit);
+        var currentOrientation = HexGrid.orientation(tile.x, tile.y, other.x, other.y);
+        if (other.type == ROAD && distance < best && currentOrientation != light.closed) {
+          orientation = currentOrientation;
+          best = distance;
+        }
+      }
+      if (orientation != null) {
+        this.renderer.proposeLight = orientation;
+      } else {
+        this.renderer.proposeLight = null;
+      }
+    }
+
     if (this.lastX == null) return;
     var deltaX = this.lastX - e.clientX;
     var deltaY = this.lastY - e.clientY;
@@ -77,9 +112,10 @@ export class Control {
   }
 
   mouseup(e) {
-    if (!this.moved()) {
+    if (!this.moved() && this.renderer.proposeLight != null) {
       const coords = this.screenToHex(this.lastX, this.lastY);
-      Meteor.apply('toggleLight', [coords[0], coords[1]], { wait: true });
+      var args = [coords[0], coords[1], this.renderer.proposeLight];
+      Meteor.apply('switchLight', args, { wait: true });
     }
     delete this.lastX;
     delete this.lastY;

@@ -95,8 +95,22 @@ export class Renderer {
 
     this.hexgrid = new HexGrid(vec3.fromValues(RADIUS_COS30,0));
     this.lanes = new Lanes(this.hexgrid, CAR_SCALE);
-    this.highlight = null;
+    this.mouseHit = vec3.create();
+    this.highlight = vec3.create();
   }
+
+  drawLight(x, y, orientation, alpha) {
+    var { gl, world, shader, disk } = this;
+    var shift = HexGrid.shifts[orientation];
+    this.hexgrid.center(_v3_0, x + shift[0]*.3, y + shift[1]*.3);
+    _v3_0[2] = 0.0002;
+
+    mat4.fromTranslation(world, _v3_0);
+    shader.uniforms.color = [1, 0, 0, alpha];
+    shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
+    disk.draw(gl.TRIANGLES);
+  }
+
   draw() {
     var { gl, car, house, office, tree, rock, canvas, shader, camera, hex, disk, rect }  = this;
     resizeCanvas(gl, canvas);
@@ -164,17 +178,16 @@ export class Renderer {
 
     // Render lights
     disk.bind(shader);
-    shader.uniforms.color = [1, 0.2, 0.3, 0.7];
+    var now = _.now();
     Lights.find().forEach((light) => {
-      var shift = HexGrid.shifts[light.closed];
-      this.hexgrid.center(_v3_0,
-        light.x + shift[0] * .3,
-        light.y + shift[1] * .3
-      );
-      _v3_0[2] = 0.0002;
-      var world = mat4.fromTranslation(this.world, _v3_0);
-      shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
-      disk.draw(gl.TRIANGLES);
+      var alpha = light.cd < now ? 1 : 0.5;
+      this.drawLight(light.x, light.y, light.closed, alpha);
+
+      // Draw a candidate light switch
+      if (this.proposeLight != null
+          && light.x == this.highlight[0] && light.y == this.highlight[1]) {
+        this.drawLight(light.x, light.y, this.proposeLight, 0.5);
+      }
     });
 
     // Render cars

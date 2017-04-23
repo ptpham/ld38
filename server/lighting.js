@@ -14,18 +14,19 @@ export function createLight({ x, y, closed, cd }) {
   return Lights.upsert({ x, y, gameId }, { $set: { closed, cd } });
 }
 
-export function switchLight(x, y, tx, ty, cd) {
-  const light = getLight(x, y);
-  if (!light) return;
-
-  const closed = HexGrid.orientation(x, y, tx, ty);
-  return createLight({ x, y, closed, cd: cd || light.cd });
-}
-
-export function toggleLight(x, y, triggerCd) {
+export function switchLight(x, y, closed, cd) {
   const light = getLight(x, y);
   const currentTime = Date.now();
   if (!light || light.cd > currentTime) return;
+  if (!light) return;
+
+  cd = cd || currentTime + LIGHT_CD;
+  return createLight({ x, y, closed, cd: cd || light.cd });
+}
+
+export function toggleLight(x, y) {
+  const light = getLight(x, y);
+  if (!light) return;
 
   var tile = Tiles.findOne({ gameId: getGameId(), x, y });
   var { paths } = tile;
@@ -40,9 +41,7 @@ export function toggleLight(x, y, triggerCd) {
   if (found == null) return;
   var picked = Tiles.findOne({ _id: paths[(found+1)%paths.length] });
 
-  if (triggerCd) {
-    return switchLight(x, y, picked.x, picked.y, currentTime + LIGHT_CD);
-  }
-  return switchLight(x, y, picked.x, picked.y);
+  const closed = HexGrid.orientation(x, y, picked.x, picked.y);
+  return switchLight(x, y, closed);
 }
 
