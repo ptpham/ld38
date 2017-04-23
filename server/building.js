@@ -2,62 +2,33 @@ import _ from 'lodash';
 import { Tiles, TREE, ROCK, AQUA, NONE, WORK, HOME, ROAD } from '../common/tiles';
 import { getGameId } from '../common/games';
 import HexGrid from '../common/hexgrid';
-import { addRoadToCostMatrix } from './pathing';
+import { addTileToCostMatrix } from './pathing';
 import { createLight } from './lighting';
+import { cantorZ } from '../common/pairing';
 
-export function build({ x, y, type, paths = null, index = null }) {
+export function build({ x, y, type }, stop) {
   const gameId = getGameId();
-  return Tiles.upsert({ x, y, gameId }, { $set: { type, paths, index } });
+  var index = index || cantorZ(x, y);
+
+  var adjacentIndexes = HexGrid.shifts.map(shift =>
+    cantorZ(x + shift[0], y + shift[1]));
+  var adjacentTiles = Tiles.find({ gameId, index: { $in: adjacentIndexes } }).fetch();
+  var adjacentRoads = _.filter(adjacentTiles, tile => tile.type == ROAD);
+  if (adjacentRoads.length == 3) createLight({ x, y, closed: 0 });
+  if (adjacentRoads.length > 3) return;
+
+  var pathables = _.filter(adjacentTiles, tile =>
+    tile.type == ROAD || tile.type == WORK || tile.type == HOME);
+  var paths = pathables.map(x => x._id);
+
+  var result = Tiles.upsert({ x, y, gameId }, { $set: { type, paths, index } });
+  if (!stop) _.each(adjacentRoads, tile => build(tile, true));
+  return result;
 }
 
-let roadIndex = 0;
-export function buildRoad(x, y) {
-  const gameId = getGameId();
-  let maxAdjacentRoads = false;
-  let paths = [];
-  let adjacentTiles = [];
-  HexGrid.adjacent(null, x, y)
-    .forEach(([ax, ay]) => {
-      const tile = Tiles.findOne({ x: ax, y: ay, type: ROAD, gameId });
-      if (tile) {
-        adjacentTiles.push(tile);
-        paths.push(tile._id);
-        maxAdjacentRoads = maxAdjacentRoads || tile.paths.length >= 3;
-      }
-    });
-  if (maxAdjacentRoads || paths.length > 3) return;
-
-  const index = roadIndex;
-  build({ x, y, type: ROAD, paths, index });
-
-  const newRoad = Tiles.findOne({ x, y, type: ROAD, gameId });
-  if (newRoad) {
-    roadIndex += 1;
-    addRoadToCostMatrix(index);
-    adjacentTiles.forEach(tile => {
-      tile.paths.push(newRoad._id);
-      build({
-        x: tile.x,
-        y: tile.y,
-        type: tile.type,
-        index: tile.index,
-        paths: tile.paths
-      });
-
-      if (tile.paths.length === 3) createLight({ x: tile.x, y: tile.y, closed: 0 });
-    });
-  }
-
-  return newRoad;
-}
-
-export function buildHome(x, y) {
-  return build({ x, y, type: HOME });
-}
-
-export function buildWork(x, y) {
-  return build({ x, y, type: WORK });
-}
+export function buildRoad(x, y) { return build({ x, y, type: ROAD }); }
+export function buildHome(x, y) { return build({ x, y, type: HOME }); }
+export function buildWork(x, y) { return build({ x, y, type: WORK }); }
 
 export function generateMap(width, height) {
   const possibleTypes = [TREE, ROCK, AQUA, NONE];
