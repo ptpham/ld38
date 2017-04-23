@@ -127,8 +127,8 @@ export class Renderer {
       const tile = Tiles.findOne({ x: light.x, y: light.y });
       const closeTile = Tiles.findOne(tile.paths[light.closed]);
       this.hexgrid.center(_v3_0,
-        light.x * .5 + closeTile.x * .5,
-        light.y * .5 + closeTile.y * .5
+        light.x * .3 + closeTile.x * .7,
+        light.y * .3 + closeTile.y * .7
       );
       var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
