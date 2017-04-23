@@ -3,6 +3,7 @@ import { flatShader } from './shaders';
 import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
 import { vec3, mat4 } from 'gl-matrix';
+import makeBox from 'geo-3d-box';
 import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
 import { Lights } from '../common/lights';
 import HexGrid from '../common/hexgrid';
@@ -18,6 +19,9 @@ var ROAD_SCALE = 0.3;
 var ROAD_SCALING = _.times(3, () => ROAD_SCALE);
 var CAR_MESH = new Mesh(carGeometry);
 var HOUSE_MESH = new Mesh(houseGeometry);
+var HOUSE_SCALINGS = [[0.15, 0.2, 0.2],[0.2,0.15,0.2],[0.2,0.2,0.15]];
+var OFFICE_MESH = makeBox({ size: 1 });
+var OFFICE_SCALINGS = [[0.3, 0.4, 0.6],[0.3,0.3,0.6],[0.4,0.6,0.6]];
 var DEGREES_60 = Math.PI/3;
 
 function resizeCanvas(gl, canvas) {
@@ -45,7 +49,7 @@ export class Renderer {
     camera.phi += Math.PI/4;
     camera.theta -= Math.PI/2;
     camera.radius = 10;
-   
+
     this.gl = gl;
     this.canvas = canvas;
     this.camera = camera;
@@ -64,6 +68,7 @@ export class Renderer {
     this.house = createGeometry(gl)
       .attr('positions', HOUSE_MESH.vertices)
       .faces(HOUSE_MESH.indices);
+    this.office = createGeometry(gl).attr('positions', OFFICE_MESH);
 
     this.view = mat4.create();
     this.projection = mat4.create();
@@ -73,7 +78,7 @@ export class Renderer {
     this.highlight = null;
   }
   draw() {
-    var { gl, car, house, canvas, shader, camera, hex, disk, rect }  = this;
+    var { gl, car, house, office, canvas, shader, camera, hex, disk, rect }  = this;
     resizeCanvas(gl, canvas);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -146,7 +151,7 @@ export class Renderer {
       disk.draw(gl.TRIANGLES);
     });
 
-    // Render cars
+    // // Render cars
     // car.bind(shader);
     // shader.uniforms.color = [0.5, 0.5, 1, 1];
     // Tiles.find().forEach(tile => {
@@ -158,11 +163,20 @@ export class Renderer {
 
     house.bind(shader);
     shader.uniforms.color = [0.9, 0.9, 1, 1];
-    Tiles.find({ type: HOME }).forEach(tile => {
+    Tiles.find({ type: HOME }).forEach((tile, i) => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
-      shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
+      shader.uniforms.world = mat4.scale(world, world, HOUSE_SCALINGS[i]);
       house.draw(gl.TRIANGLES);
+    });
+
+    office.bind(shader);
+    shader.uniforms.color = [0.9, 1, 0.9, 1];
+    Tiles.find({ type: WORK }).forEach((tile, i) => {
+      this.hexgrid.center(_v3_0, tile.x, tile.y);
+      var world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.world = mat4.scale(world, world, OFFICE_SCALINGS[i]);
+      office.draw(gl.TRIANGLES);
     });
   }
 }
