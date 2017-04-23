@@ -3,7 +3,7 @@ import { flatShader } from './shaders';
 import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
 import { vec3, mat4 } from 'gl-matrix';
-import { Tiles, ROAD, WORK, HOME, TREE } from '../common/tiles';
+import { Tiles, ROAD, WORK, HOME, TREE, AQUA } from '../common/tiles';
 import { Cars } from '../common/cars';
 import { Teams } from '../common/teams';
 import { Lights } from '../common/lights';
@@ -17,6 +17,7 @@ import treeGeometry from './geometry/tree';
 import _ from 'lodash';
 
 var _v3_0 = vec3.create();
+var _v3_1 = vec3.create();
 const RADIUS = 1;
 const RADIUS_COS30 = RADIUS*Math.cos(Math.PI/6);
 var ROAD_SCALE = 0.3;
@@ -102,16 +103,20 @@ export class Renderer {
     hex.bind(shader);
     shader.uniforms.view = view;
     shader.uniforms.projection = projection;
-    _v3_0[2] = 0;
 
     Tiles.find().forEach(tile => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
+      _v3_0[2] = 0;
 
       var color = [0.92,0.9,0.9,1];
       if (tile.type == WORK) {
         color = [0, 1, 0, 1];
       } else if (tile.type == HOME) {
         color = [0, 0, 1, 1];
+      } else if (tile.type == AQUA) {
+        color = [0.70, 0.9, 0.95, 1];
+        vec3.set(_v3_1, 0, 0, -0.03);
+        vec3.add(_v3_0, _v3_0, _v3_1);
       }
       if (this.highlight != null
         && this.highlight[0] == tile.x && this.highlight[1] == tile.y) {
