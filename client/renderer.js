@@ -151,7 +151,7 @@ export class Renderer {
     this.car.bind(shader);
     shader.uniforms.color = [0.5, 0.5, 1, 1];
     Cars.find().forEach(car => {
-      var tile = Tiles.findOne(car.currentTileId);
+      var tile = Tiles.findOne({ _id: car.currentTileId });
       if (tile == null) return;
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
