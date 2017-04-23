@@ -7,6 +7,7 @@ import { Cars } from '../common/cars';
 import { generateMap, buildRoad, buildHome, buildWork } from './building';
 import { switchLight } from './lighting';
 import { findDistances } from './pathing';
+import { simulate } from './automata';
 
 Meteor.startup(() => {
   // code to run on server at startup
@@ -25,7 +26,8 @@ Meteor.startup(() => {
     buildRoad,
     switchLight
   });
-  Meteor.setInterval(() => {
-    findDistances();
-  }, 5000);
+
+  findDistances();
+  Meteor.setInterval(() => { findDistances(); }, 5000);
+  Meteor.setInterval(() => { simulate(); }, 1000);
 });

@@ -5,6 +5,7 @@ import createGeometry from 'gl-geometry';
 import { vec3, mat4 } from 'gl-matrix';
 import makeBox from 'geo-3d-box';
 import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
+import { Cars } from '../common/cars';
 import { Lights } from '../common/lights';
 import HexGrid from '../common/hexgrid';
 import { Mesh } from 'webgl-obj-loader';
@@ -151,15 +152,17 @@ export class Renderer {
       disk.draw(gl.TRIANGLES);
     });
 
-    // // Render cars
-    // car.bind(shader);
-    // shader.uniforms.color = [0.5, 0.5, 1, 1];
-    // Tiles.find().forEach(tile => {
-    //   this.hexgrid.center(_v3_0, tile.x, tile.y);
-    //   var world = mat4.fromTranslation(this.world, _v3_0);
-    //   shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
-    //   car.draw(gl.TRIANGLES);
-    // });
+    // Render cars
+    this.car.bind(shader);
+    shader.uniforms.color = [0.5, 0.5, 1, 1];
+    Cars.find().forEach(car => {
+      var tile = Tiles.findOne(car.currentTileId);
+      if (tile == null) return;
+      this.hexgrid.center(_v3_0, tile.x, tile.y);
+      var world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
+      this.car.draw(gl.TRIANGLES);
+    });
 
     house.bind(shader);
     shader.uniforms.color = [0.9, 0.9, 1, 1];
