@@ -27,8 +27,8 @@ Meteor.startup(() => {
   Meteor.publish('teams', () => Teams.find({ gameId }));
   Meteor.methods({
     buildWork,
-    buildHome,
-    buildRoad,
+    buildHome: (x, y, teamId) => buildHome(x, y, teamId, true),
+    buildRoad: (x, y) => buildRoad(x, y, true),
     harvestTile,
     switchLight,
     toggleLight: (x, y) => toggleLight(x, y, true),
