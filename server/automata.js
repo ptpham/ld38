@@ -5,61 +5,92 @@ import { Cars } from '../common/cars';
 import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
 import { getGameId } from '../common/games';
 import { cantorZ, cantorXY } from '../common/pairing';
+import pathing from './pathing';
 
 export function assignWork(workTiles, car) {
-  var work = _.sample(workTiles)._id;
+  var work = _.sample(workTiles);
   if (work == null) return;
-  return Cars.upsert(_.pick(car, 'homeTileId', 'gameId'), { $set: { workTileId } });
+  car.workTileId = work._id;
 }
 
-export function checkSlotOpen(tile, slot) {
-  var others = Cars.find({ currentTileId: tile._id }).fetch();
-  for (var other of otehrs) {
-    if (other.slot[0] == slot[0] && other.slot[1] == slot[1]) return false;
+export function assignDestination(car) {
+  var dstTileId = null;
+  if (car.currentTileId == car.homeTileId && car.workTileId != null) {
+    dstTileId = car.workTileId;
   }
-  return true;
-}
-
-function findEmbarkSlot(car, tile) {
-
-}
-
-export function embarkCar(car) {
-  if (car.workTileId == null) return false;
-  if (car.currentTileId != car.workTileId
-    && car.currentTileId != car.homeTileId) return false;
-  var currentTile = Tiles.findOne({ _id: car.currentTileId });
-
-  for (var _id of _.shuffle(homeTile.paths)) {
-    var tile = Tiles.findOne({ _id });
-    if (tile.type != ROAD) continue;
-    var slot = findEmbarkSlot(car, tile);
-    if (slot == null || checkSlotOpen(tile, slot)) continue;
-    Tiles.update({ _id: car._id }, { $set: { currentTileId: _id, slot } })
-    return true;
+  if (car.currentTileId == car.workTileId) {
+    dstTileId = car.homeTileId;
   }
-  return false;
+  if (dstTileId == null) return;
+  car.dstTileId = dstTileId;
 }
 
-export function createCar(homeTile) {
+export function checkSlotOpen(tile, orientation, leaving) {
+  return Cars.findOne({ currentTileId: tile._id,
+    orientation, leaving, gameId: getGameId() }) == null;
+}
+
+function routeCar(car) {
+  var current = Tiles.findOne({ _id: car.currentTileId });
+  var last = Tiles.findOne({ _id: car.lastTileId }) || {};
+  var dst = Tiles.findOne({ _id: car.dstTileId });
+  if (dst == null) return;
+  var next = pathing.findNextTile(current.x, current.y,
+    dst.x, dst.y, last.x || -1, last.y || -1);
+  if (next == null) return null;
+
+  var orientation = HexGrid.orientation(current.x, current.y, next.x, next.y);
+  return { next, orientation };
+}
+
+function moveCar(car, route) {
+  if (route == null) return car;
+
+  // Deal with an embark
+  if (car.orientation == null) {
+    car.orientation = route.orientation;
+    car.leaving = true;
+    return car;
+  }
+
+  // Deal with a turn in the same tile
+  var opposite = HexGrid.opposite(route.orientation);
+  if (car.orientation != opposite) {
+    car.orientation = opposite;
+    car.leaving = true;
+    return car;
+  }
+
+  // Deal with a transition to the next tile
+  car.lastTileId = route.next._id == car.dstTileId ? null : car.currentTileId;
+  car.currentTileId = route.next._id;
+  car.leaving = false;
+  return car;
+}
+
+export function createCar(homeTile, teamId) {
   var gameId = getGameId();
   var homeTileId = homeTile._id;
   var currentTileId = homeTileId;
   return Cars.upsert({ homeTileId, gameId },
-    { $set: { currentTileId, slot: [0,0], teamId } });
+    { $set: { currentTileId, teamId } });
 }
 
 export function simulate() {
   var homeTiles = Tiles.find({ type: HOME }).fetch();
   var workTiles = Tiles.find({ type: WORK }).fetch();
+  var teamId = 0;
+
   for (var home of homeTiles) {
-    if (!Car.fetchOne({ homeTileId: home._id })) {
-      createCar(homeTile);
+    if (!Cars.findOne({ homeTileId: home._id })) {
+      createCar(home, teamId);
     }
 
-    var car = Car.fetchOne({ homeTileId: home._id }); 
-    assignWork(workTiles, car);
-    if (embarkCar(car)) continue;
+    var car = Cars.findOne({ homeTileId: home._id }); 
+    if (car.workTileId == null) assignWork(workTiles, car);
+    assignDestination(car);
+    moveCar(car, routeCar(car));
+    Cars.update({ _id: car._id }, { $set: car });
   }
 }
 

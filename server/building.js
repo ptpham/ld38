@@ -14,15 +14,17 @@ export function build({ x, y, type }, stop) {
     cantorZ(x + shift[0], y + shift[1]));
   var adjacentTiles = Tiles.find({ gameId, index: { $in: adjacentIndexes } }).fetch();
   var adjacentRoads = _.filter(adjacentTiles, tile => tile.type == ROAD);
-  if (adjacentRoads.length == 3) createLight({ x, y, closed: 0 });
-  if (adjacentRoads.length > 3) return;
+  if (type == ROAD) {
+    if (adjacentRoads.length == 3) createLight({ x, y, closed: 0 });
+    if (adjacentRoads.length > 3) return;
+  }
 
   var pathables = _.filter(adjacentTiles, tile =>
     tile.type == ROAD || tile.type == WORK || tile.type == HOME);
   var paths = pathables.map(x => x._id);
 
   var result = Tiles.upsert({ x, y, gameId }, { $set: { type, paths, index } });
-  if (!stop) _.each(adjacentRoads, tile => build(tile, true));
+  if (!stop) _.each(pathables, tile => build(tile, true));
   return result;
 }
 

@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import Matrix from 'ml-matrix';
 import floydWarshall from 'ml-floyd-warshall';
-import { Tiles, ROAD } from '../common/tiles';
+import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
 import { getGameId } from '../common/games';
 import { cantorXY, cantorZ } from '../common/pairing';
-import { HexGrid } from '../common/hexgrid';
+import HexGrid from '../common/hexgrid';
 
 export const pathing = {
   // cost matrix
@@ -16,7 +16,8 @@ export const pathing = {
 };
 
 export function findDistances() {
-  const tiles = Tiles.find({ gameId: getGameId() }).fetch();
+  const tiles = Tiles.find({ gameId: getGameId(),
+    type: { $in: [ROAD, WORK, HOME] } }).fetch();
   var { cMatrix } = pathing;
 
   var aMatrix = Matrix.zeros(tiles.length, tiles.length);
@@ -43,6 +44,7 @@ export function findDistances() {
   });
 
   pathing.mapUp = mapUp;
+  pathing.mapDown = mapDown;
   pathing.dMatrix = floydWarshall(aMatrix);
   return pathing;
 }
@@ -53,21 +55,23 @@ export function findNextTile(x, y, xG, yG, xF, yF) {
   let next = null;
   const start = mapDown.get(cantorZ(x, y));
   const goal = mapDown.get(cantorZ(xG, yG));
-  if (start == null || goal == null) return;
 
-  const from = mapDown.get(cantorZ(xF, yF));
+  if (start == null || goal == null) return;
   const min = dMatrix.get(start, goal);
   if (min === -1) return;
 
+  var from = xF == null || yF == null ? null : cantorZ(xF, yF);
   for (var shift of HexGrid.shifts) {
-    var adj = mapDown.get(cantorZ(x + shift[0], y + shift[1]));
-    if (adj == null || from === adj) continue; // ignore where it came from
-    const sumCost = cMatrix.get(adj) + dMatrix.get(adj, goal);
-    if (sumCost === min) {
-      next = mapUp.get(adj);
-      break;
+    var adj = cantorZ(x + shift[0], y + shift[1]);
+    if (from != null && from == adj) continue; // ignore where it came from
+    var edgeCost = cMatrix.get(cantorZ(start, adj)) || 1;
+    if (!mapDown.has(adj)) continue;
+    var farCost = dMatrix.get(mapDown.get(adj), goal);
+    if (farCost == -1) continue;
+    const sumCost = edgeCost + farCost;
+    if (sumCost == min) {
+      next = Tiles.findOne({ gameId: getGameId(), index: adj});
+      if (next != null) return next;
     }
   }
-
-  return Tiles.findOne({ gameId: getGameId(), index: next });
 }
