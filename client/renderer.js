@@ -3,7 +3,7 @@ import { flatShader } from './shaders';
 import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
 import { vec3, mat4 } from 'gl-matrix';
-import { Tiles, ROAD, WORK, HOME, TREE, AQUA } from '../common/tiles';
+import { Tiles, ROAD, WORK, HOME, TREE, AQUA, ROCK } from '../common/tiles';
 import { Cars } from '../common/cars';
 import { Teams } from '../common/teams';
 import { Lights } from '../common/lights';
@@ -14,6 +14,7 @@ import carGeometry from './geometry/car';
 import houseGeometry from './geometry/house';
 import officeGeometry from './geometry/office';
 import treeGeometry from './geometry/tree';
+import rockGeometry from './geometry/rock';
 import _ from 'lodash';
 
 var _v3_0 = vec3.create();
@@ -25,11 +26,13 @@ var CAR_SCALE = 0.12;
 var ROAD_SCALING = _.times(3, () => ROAD_SCALE);
 var CAR_MESH = new Mesh(carGeometry);
 var HOUSE_MESH = new Mesh(houseGeometry);
-var TREE_MESH = new Mesh(treeGeometry);
 var OFFICE_MESH = new Mesh(officeGeometry);
+var TREE_MESH = new Mesh(treeGeometry);
+var ROCK_MESH = new Mesh(rockGeometry);
 var HOUSE_SCALINGS = [[0.15, 0.2, 0.2],[0.2,0.15,0.2],[0.2,0.2,0.15]];
 var OFFICE_SCALINGS = [[0.3, 0.4, 0.4],[0.3,0.3,0.4],[0.4,0.6,0.4]];
 var TREE_SCALINGS = [[0.2, 0.2, 0.2],[0.2,0.2,0.3],[0.15,0.15,0.4]];
+var ROCK_SCALINGS = [[0.1, 0.1, 0.1],[0.2,0.1,0.2],[0.1,0.2,0.2]];
 var DEGREES_60 = Math.PI/3;
 
 function resizeCanvas(gl, canvas) {
@@ -82,6 +85,9 @@ export class Renderer {
     this.office = createGeometry(gl)
       .attr('positions', OFFICE_MESH.vertices)
       .faces(OFFICE_MESH.indices);
+    this.rock = createGeometry(gl)
+      .attr('positions', ROCK_MESH.vertices)
+      .faces(ROCK_MESH.indices);
 
     this.view = mat4.create();
     this.projection = mat4.create();
@@ -91,7 +97,7 @@ export class Renderer {
     this.highlight = null;
   }
   draw() {
-    var { gl, car, house, office, tree, canvas, shader, camera, hex, disk, rect }  = this;
+    var { gl, car, house, office, tree, rock, canvas, shader, camera, hex, disk, rect }  = this;
     resizeCanvas(gl, canvas);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -205,6 +211,15 @@ export class Renderer {
       var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.world = mat4.scale(world, world, TREE_SCALINGS[i % 3]);
       tree.draw(gl.TRIANGLES);
+    });
+
+    rock.bind(shader);
+    shader.uniforms.color = [0.5, 0.5, 0.5, 1];
+    Tiles.find({ type: ROCK }).forEach((tile, i) => {
+      this.hexgrid.center(_v3_0, tile.x, tile.y);
+      var world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.world = mat4.scale(world, world, ROCK_SCALINGS[i % 3]);
+      rock.draw(gl.TRIANGLES);
     });
   }
 }
