@@ -1,5 +1,20 @@
 /* CSS declarations go here */
 
-body { margin: 0px; }
+body {
+  margin: 0px;
+  font-family: helvetica;
+}
 canvas { width: 100vw; height: 100vh; }
+
+#harvest-overlay {
+  transition: opacity 0.2s;
+  display: flex;
+  position: absolute;
+  padding: 20px;
+  opacity: 1;
+}
+
+#harvest-overlay.hidden {
+  display: none;
+}
 

@@ -29,6 +29,7 @@
     {{> score}}
   {{/each}}
   <canvas id="canvas"></canvas>
+  {{> harvest }}
 </body>
 
 <template name="score">
@@ -36,5 +37,12 @@
     class="team {{teamClass index}}"
     style="background: {{background color}}">
       {{resources}}
+  </div>
+</template>
+
+<template name="harvest">
+  <div id="harvest-overlay" class="{{isHidden}}"
+    style="left: {{leftPos}}px; top: {{topPos}}px; ">
+    Money Earned: <div id="money-earned">{{resourcesEarned}}</div>
   </div>
 </template>
