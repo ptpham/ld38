@@ -52,11 +52,11 @@ export function buildRoad(x, y) {
 }
 
 export function buildHome(x, y) {
-  return build(x, y, HOME);
+  return build({ x, y, type: HOME });
 }
 
 export function buildWork(x, y) {
-  return build(x, y, WORK);
+  return build({ x, y, type: WORK });
 }
 
 export function generateMap(width, height) {
@@ -75,6 +75,8 @@ export function generateMap(width, height) {
     buildRoad(center[0] + 1, center[1]);
     buildRoad(center[0], center[1] - 1);
     buildRoad(center[0] - 1, center[1] + 1);
+    buildWork(center[0] + 1, center[1] + 1);
+    buildHome(center[0] - 1, center[1] - 1);
   }
   return Tiles;
 }

@@ -3,7 +3,7 @@ import { flatShader } from './shaders';
 import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
 import { vec3, mat4 } from 'gl-matrix';
-import { Tiles, ROAD } from '../common/tiles';
+import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
 import { Lights } from '../common/lights';
 import HexGrid from '../common/hexgrid';
 import { Mesh } from 'webgl-obj-loader';
@@ -86,6 +86,11 @@ export class Renderer {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
 
       var color = [0.92,0.9,0.9,1];
+      if (tile.type == WORK) {
+        color = [0, 1, 0, 1];
+      } else if (tile.type == HOME) {
+        color = [0, 0, 1, 1];
+      }
       if (this.highlight != null
         && this.highlight[0] == tile.x && this.highlight[1] == tile.y) {
         color[0] = 1;
@@ -110,6 +115,7 @@ export class Renderer {
     Tiles.find({ type: ROAD }).forEach(tile => {
       const adjTiles = tile.paths.map(id => Tiles.findOne(id));
       adjTiles.forEach(tileA => {
+        if (tileA == null) return;
         const orient = HexGrid.orientation(tile.x, tile.y, tileA.x, tileA.y);
         this.hexgrid.center(_v3_0, tile.x, tile.y);
         var world = mat4.fromTranslation(this.world, _v3_0);

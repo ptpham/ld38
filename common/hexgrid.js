@@ -77,6 +77,11 @@ export default class HexGrid {
     return result;
   }
 
+  static adjacentByOrientation(result, i, j, orientation) {
+    vec2.set(_v2_0, i, j);
+    return vec2.add(result, shifts[orientation], _v2_0);
+  }
+
   static orientation(i0, j0, i1, j1) {
     var di = i1 - i0;
     var dj = j1 - j0;
@@ -90,6 +95,10 @@ export default class HexGrid {
       if (dj == 0) return 3;
       else if (dj == 1) return 2;
     }
+  }
+
+  static opposite(orientation) {
+    return (orientation + 3) % 6;
   }
 }
 
