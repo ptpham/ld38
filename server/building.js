@@ -15,7 +15,11 @@ export function build({ x, y, type }, stop) {
   var adjacentTiles = Tiles.find({ gameId, index: { $in: adjacentIndexes } }).fetch();
   var adjacentRoads = _.filter(adjacentTiles, tile => tile.type == ROAD);
   if (type == ROAD) {
-    if (adjacentRoads.length == 3) createLight({ x, y, closed: 0 });
+    if (adjacentRoads.length == 3) {
+      var closedTile = Tiles.findOne({ _id: _.sample(adjacentRoads)._id });
+      var closed = HexGrid.orientation(x, y, closedTile.x, closedTile.y);
+      createLight({ x, y, closed });
+    }
     if (adjacentRoads.length > 3) return;
   }
 

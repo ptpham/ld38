@@ -5,7 +5,7 @@ import { Lights } from '../common/lights';
 import { Cars } from '../common/cars';
 
 import { generateMap, buildRoad, buildHome, buildWork } from './building';
-import { switchLight } from './lighting';
+import { toggleLight, switchLight } from './lighting';
 import { findDistances } from './pathing';
 import { simulate } from './automata';
 
@@ -24,7 +24,8 @@ Meteor.startup(() => {
     buildWork,
     buildHome,
     buildRoad,
-    switchLight
+    switchLight,
+    toggleLight
   });
 
   findDistances();

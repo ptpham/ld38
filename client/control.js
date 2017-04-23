@@ -1,6 +1,7 @@
 
 import { vec3, mat4 } from 'gl-matrix';
 import { Meteor } from 'meteor/meteor';
+import _ from 'lodash';
 
 var _v3_0 = vec3.create();
 var _v3_1 = vec3.create();
@@ -78,7 +79,7 @@ export class Control {
   mouseup(e) {
     if (!this.moved()) {
       const coords = this.screenToHex(this.lastX, this.lastY);
-      Meteor.apply('switchLight', [coords[0], coords[1]], { wait: true });
+      Meteor.apply('toggleLight', [coords[0], coords[1]], { wait: true });
     }
     delete this.lastX;
     delete this.lastY;

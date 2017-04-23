@@ -3,7 +3,7 @@ import _ from 'lodash';
 import HexGrid from '../common/hexgrid';
 import { Cars } from '../common/cars';
 import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
-import { Lights } from '../common/lights';
+import lighting from './lighting';
 import { getGameId } from '../common/games';
 import { cantorZ, cantorXY } from '../common/pairing';
 import pathing from './pathing';
@@ -58,16 +58,17 @@ function moveCar(car, route) {
   var opposite = HexGrid.opposite(route.orientation);
   if (car.leaving == false && car.orientation != opposite) {
     var tile = Tiles.findOne(car.currentTileId);
-    var light = Lights.findOne({ x: tile.x, y: tile.y });
-    if (light != null && (light.closed == opposite
-      || light.closed == car.orientation)) return car;
-    car.orientation = opposite;
+    var light = lighting.getLight(tile.x, tile.y);
+    if (light != null && (light.closed == route.orientation
+      || car.orientation == light.closed)) return car;
+    car.orientation = route.orientation;
     car.leaving = true;
     return car;
   }
 
   // Deal with a transition to the next tile
   car.lastTileId = route.next._id == car.dstTileId ? null : car.currentTileId;
+  car.orientation = opposite;
   car.currentTileId = route.next._id;
   car.leaving = false;
   return car;
@@ -82,12 +83,13 @@ export function createCar(homeTile, teamId) {
 }
 
 export function simulate() {
-  var homeTiles = Tiles.find({ type: HOME }).fetch();
-  var workTiles = Tiles.find({ type: WORK }).fetch();
+  var gameId = getGameId();
+  var homeTiles = Tiles.find({ type: HOME, gameId }).fetch();
+  var workTiles = Tiles.find({ type: WORK, gameId }).fetch();
   var teamId = 0;
 
   for (var home of homeTiles) {
-    if (!Cars.findOne({ homeTileId: home._id })) {
+    if (!Cars.findOne({ gameId, homeTileId: home._id })) {
       createCar(home, teamId);
     }
 
@@ -95,7 +97,7 @@ export function simulate() {
     if (car.workTileId == null) assignWork(workTiles, car);
     assignDestination(car);
     moveCar(car, routeCar(car));
-    Cars.update({ _id: car._id }, { $set: car });
+    Cars.update({ _id: car._id, gameId  }, { $set: car });
   }
 }
 

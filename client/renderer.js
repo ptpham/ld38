@@ -141,13 +141,13 @@ export class Renderer {
 
     // Render lights
     disk.bind(shader);
-    shader.uniforms.color = [0.8, 0.2, 0.2, 0.5];
+    shader.uniforms.color = [1, 0.2, 0.3, 0.7];
     Lights.find().forEach((light) => {
       const tile = Tiles.findOne({ x: light.x, y: light.y });
-      const closeTile = Tiles.findOne(tile.paths[light.closed]);
+      var shift = HexGrid.shifts[light.closed];
       this.hexgrid.center(_v3_0,
-        light.x * .7 + closeTile.x * .3,
-        light.y * .7 + closeTile.y * .3
+        light.x + shift[0] * .3,
+        light.y + shift[1] * .3
       );
       var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
