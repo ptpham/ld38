@@ -3,6 +3,7 @@ import _ from 'lodash';
 import HexGrid from '../common/hexgrid';
 import { Cars } from '../common/cars';
 import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
+import { Lights } from '../common/lights';
 import { getGameId } from '../common/games';
 import { cantorZ, cantorXY } from '../common/pairing';
 import pathing from './pathing';
@@ -55,7 +56,11 @@ function moveCar(car, route) {
 
   // Deal with a turn in the same tile
   var opposite = HexGrid.opposite(route.orientation);
-  if (car.orientation != opposite) {
+  if (car.leaving == false && car.orientation != opposite) {
+    var tile = Tiles.findOne(car.currentTileId);
+    var light = Lights.findOne({ x: tile.x, y: tile.y });
+    if (light != null && (light.closed == opposite
+      || light.closed == car.orientation)) return car;
     car.orientation = opposite;
     car.leaving = true;
     return car;
