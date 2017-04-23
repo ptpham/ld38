@@ -11,3 +11,6 @@ export const TREE = 'TREE';
 export const ROCK = 'ROCK';
 export const AQUA = 'AQUA';
 export const NONE = 'NONE';
+
+export const MAX_RESOURCES = 10;
+

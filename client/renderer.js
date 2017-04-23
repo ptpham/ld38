@@ -94,6 +94,7 @@ export class Renderer {
     this.world = mat4.create();
 
     this.hexgrid = new HexGrid(vec3.fromValues(RADIUS_COS30,0));
+    this.lanes = new Lanes(this.hexgrid, CAR_SCALE);
     this.highlight = null;
   }
   draw() {
@@ -138,7 +139,7 @@ export class Renderer {
     // Render road centers
     disk.bind(shader);
     shader.uniforms.color = [0.5, 0.5, 0.5, 1];
-    _v3_0[2] = 0.1;
+    _v3_0[2] = 0.0001;
     Tiles.find({ type: ROAD }).forEach(tile => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
@@ -170,7 +171,7 @@ export class Renderer {
         light.x + shift[0] * .3,
         light.y + shift[1] * .3
       );
-      _v3_0[2] = 0.11;
+      _v3_0[2] = 0.0002;
       var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
       disk.draw(gl.TRIANGLES);
@@ -181,11 +182,9 @@ export class Renderer {
     Cars.find().forEach(car => {
       var tile = Tiles.findOne({ _id: car.currentTileId });
       if (tile == null) return;
-      this.hexgrid.center(_v3_0, tile.x, tile.y);
-      var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.color = Teams.findOne({ index: car.teamId }).color;
-      shader.uniforms.world = Lanes.applyLaneTransform(world,
-        car.orientation, car.leaving, CAR_SCALE);
+      shader.uniforms.world = this.lanes.applyLaneTransform(this.world,
+        car._id, tile.x, tile.y, car.orientation, car.leaving);
       this.car.draw(gl.TRIANGLES);
     });
 
