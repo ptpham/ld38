@@ -3,7 +3,6 @@ import { flatShader } from './shaders';
 import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
 import { vec3, mat4 } from 'gl-matrix';
-import makeBox from 'geo-3d-box';
 import { Tiles, ROAD, WORK, HOME, TREE } from '../common/tiles';
 import { Cars } from '../common/cars';
 import { Teams } from '../common/teams';
@@ -13,6 +12,7 @@ import HexGrid from '../common/hexgrid';
 import { Mesh } from 'webgl-obj-loader';
 import carGeometry from './geometry/car';
 import houseGeometry from './geometry/house';
+import officeGeometry from './geometry/office';
 import treeGeometry from './geometry/tree';
 import _ from 'lodash';
 
@@ -25,9 +25,9 @@ var ROAD_SCALING = _.times(3, () => ROAD_SCALE);
 var CAR_MESH = new Mesh(carGeometry);
 var HOUSE_MESH = new Mesh(houseGeometry);
 var TREE_MESH = new Mesh(treeGeometry);
+var OFFICE_MESH = new Mesh(officeGeometry);
 var HOUSE_SCALINGS = [[0.15, 0.2, 0.2],[0.2,0.15,0.2],[0.2,0.2,0.15]];
-var OFFICE_MESH = makeBox({ size: 1 });
-var OFFICE_SCALINGS = [[0.3, 0.4, 0.6],[0.3,0.3,0.6],[0.4,0.6,0.6]];
+var OFFICE_SCALINGS = [[0.3, 0.4, 0.4],[0.3,0.3,0.4],[0.4,0.6,0.4]];
 var TREE_SCALINGS = [[0.2, 0.2, 0.2],[0.2,0.2,0.3],[0.15,0.15,0.4]];
 var DEGREES_60 = Math.PI/3;
 
@@ -78,7 +78,9 @@ export class Renderer {
     this.tree = createGeometry(gl)
       .attr('positions', TREE_MESH.vertices)
       .faces(TREE_MESH.indices);
-    this.office = createGeometry(gl).attr('positions', OFFICE_MESH);
+    this.office = createGeometry(gl)
+      .attr('positions', OFFICE_MESH.vertices)
+      .faces(OFFICE_MESH.indices);
 
     this.view = mat4.create();
     this.projection = mat4.create();
