@@ -5,7 +5,7 @@ import { Lights } from '../common/lights';
 import { Cars } from '../common/cars';
 import { Teams } from '../common/teams';
 
-import { generateMap, buildRoad, buildHome, buildWork } from './building';
+import { generateMap, buildRoad, buildHome } from './building';
 import { harvestTile } from './resources';
 import { toggleLight, switchLight } from './lighting';
 import { findDistances } from './pathing';
@@ -26,9 +26,8 @@ Meteor.startup(() => {
   Meteor.publish('cars', () => Cars.find({ gameId }));
   Meteor.publish('teams', () => Teams.find({ gameId }));
   Meteor.methods({
-    buildWork,
-    buildHome,
-    buildRoad,
+    buildHome: (x, y, teamId) => buildHome(x, y, teamId, true),
+    buildRoad: (x, y) => buildRoad(x, y, true),
     harvestTile,
     switchLight,
     toggleLight: (x, y) => toggleLight(x, y, true),

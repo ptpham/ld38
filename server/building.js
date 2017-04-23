@@ -2,7 +2,6 @@ import _ from 'lodash';
 import { Tiles, TREE, ROCK, AQUA, NONE, WORK, HOME, ROAD } from '../common/tiles';
 import { getGameId } from '../common/games';
 import HexGrid from '../common/hexgrid';
-import { addTileToCostMatrix } from './pathing';
 import { createLight } from './lighting';
 import { cantorZ } from '../common/pairing';
 
@@ -13,7 +12,9 @@ export function build({ x, y, type }, stop) {
   var adjacentIndexes = HexGrid.shifts.map(shift =>
     cantorZ(x + shift[0], y + shift[1]));
   var adjacentTiles = Tiles.find({ gameId, index: { $in: adjacentIndexes } }).fetch();
-  var adjacentRoads = _.filter(adjacentTiles, tile => tile.type == ROAD);
+  var pathables = _.filter(adjacentTiles, tile =>
+    tile.type == ROAD || tile.type == WORK || tile.type == HOME);
+  var adjacentRoads = _.filter(pathables, tile => tile.type == ROAD);
   if (type == ROAD) {
     if (adjacentRoads.length == 3) {
       var closedTile = Tiles.findOne({ _id: _.sample(adjacentRoads)._id });
@@ -23,17 +24,29 @@ export function build({ x, y, type }, stop) {
     if (adjacentRoads.length > 3) return;
   }
 
-  var pathables = _.filter(adjacentTiles, tile =>
-    tile.type == ROAD || tile.type == WORK || tile.type == HOME);
+  var roads = adjacentRoads.length;
   var paths = pathables.map(x => x._id);
 
-  var result = Tiles.upsert({ x, y, gameId }, { $set: { type, paths, index } });
+  var result = Tiles.upsert({ x, y, gameId }, { $set: { type, paths, roads, index } });
   if (!stop) _.each(pathables, tile => build(tile, true));
   return result;
 }
 
-export function buildRoad(x, y) { return build({ x, y, type: ROAD }); }
-export function buildHome(x, y) { return build({ x, y, type: HOME }); }
+export function buildRoad(x, y, check) {
+  const gameId = getGameId();
+  const tile = Tiles.findOne({ x, y, gameId });
+  if (tile.roads || !check) {
+    build({ x, y, type: ROAD });
+  }
+}
+export function buildHome(x, y, teamId, check) {
+  const gameId = getGameId();
+  const tile = Tiles.findOne({ x, y, gameId });
+  if (tile.roads == 1 || !check) {
+    build({ x, y, type: HOME });
+    Tiles.upsert({ x, y, gameId }, { $set: { teamId } });
+  }
+}
 export function buildWork(x, y) { return build({ x, y, type: WORK }); }
 
 export function generateMap(width, height) {
@@ -53,7 +66,7 @@ export function generateMap(width, height) {
     buildRoad(center[0], center[1] - 1);
     buildRoad(center[0] - 1, center[1] + 1);
     buildWork(center[0] + 1, center[1] + 1);
-    buildHome(center[0] - 1, center[1] - 1);
+    buildHome(center[0] - 1, center[1] - 1, 0);
   }
   return Tiles;
 }

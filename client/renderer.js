@@ -2,10 +2,10 @@
 import { flatShader } from './shaders';
 import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
-import { vec3, mat4 } from 'gl-matrix';
+import { vec3, vec4, mat4 } from 'gl-matrix';
 import { Tiles, ROAD, WORK, HOME, TREE, AQUA, ROCK } from '../common/tiles';
 import { Cars } from '../common/cars';
-import { Teams } from '../common/teams';
+import { TEAM_COLORS } from '../common/teams';
 import { Lights } from '../common/lights';
 import Lanes from './lanes';
 import HexGrid from '../common/hexgrid';
@@ -19,6 +19,7 @@ import _ from 'lodash';
 
 var _v3_0 = vec3.create();
 var _v3_1 = vec3.create();
+var _v4_0 = vec4.create();
 const RADIUS = 1;
 const RADIUS_COS30 = RADIUS*Math.cos(Math.PI/6);
 var ROAD_SCALE = 0.3;
@@ -134,7 +135,8 @@ export class Renderer {
       if (tile.type == WORK) {
         color = [0, 1, 0, 1];
       } else if (tile.type == HOME) {
-        color = [0, 0, 1, 1];
+        color = vec4.set(_v4_0, ...TEAM_COLORS[tile.teamId]);
+        color[3] = 0.7;
       } else if (tile.type == AQUA) {
         color = [0.70, 0.9, 0.95, 1];
         vec3.set(_v3_1, 0, 0, -0.03);
@@ -195,7 +197,7 @@ export class Renderer {
     Cars.find().forEach(car => {
       var tile = Tiles.findOne({ _id: car.currentTileId });
       if (tile == null) return;
-      shader.uniforms.color = Teams.findOne({ index: car.teamId }).color;
+      shader.uniforms.color = TEAM_COLORS[car.teamId];
       shader.uniforms.world = this.lanes.applyLaneTransform(this.world,
         car._id, tile.x, tile.y, car.orientation, car.leaving);
       this.car.draw(gl.TRIANGLES);
@@ -207,6 +209,7 @@ export class Renderer {
     Tiles.find({ type: HOME }).forEach((tile, i) => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.color = TEAM_COLORS[tile.teamId];
       shader.uniforms.world = mat4.scale(world, world, HOUSE_SCALINGS[i % 3]);
       house.draw(gl.TRIANGLES);
     });
