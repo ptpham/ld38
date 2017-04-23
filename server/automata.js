@@ -21,6 +21,9 @@ export function assignDestination(car) {
   }
   if (car.currentTileId == car.workTileId) {
     dstTileId = car.homeTileId;
+    var inc = {};
+    inc['resources.' + car.teamId] = 1;
+    Tiles.update({ _id: car.workTileId }, { $inc: inc });
   }
   if (dstTileId == null) return;
   car.dstTileId = dstTileId;

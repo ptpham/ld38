@@ -6,6 +6,7 @@ import { Cars } from '../common/cars';
 import { Teams } from '../common/teams';
 
 import { generateMap, buildRoad, buildHome, buildWork } from './building';
+import { harvestTile } from './resources';
 import { toggleLight, switchLight } from './lighting';
 import { findDistances } from './pathing';
 import { simulate } from './automata';
@@ -27,6 +28,7 @@ Meteor.startup(() => {
     buildWork,
     buildHome,
     buildRoad,
+    harvestTile,
     switchLight,
     toggleLight: (x, y) => toggleLight(x, y, true)
   });

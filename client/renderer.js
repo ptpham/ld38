@@ -139,7 +139,7 @@ export class Renderer {
     // Render road centers
     disk.bind(shader);
     shader.uniforms.color = [0.5, 0.5, 0.5, 1];
-    _v3_0[2] = 0.1;
+    _v3_0[2] = 0.0001;
     Tiles.find({ type: ROAD }).forEach(tile => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
@@ -171,7 +171,7 @@ export class Renderer {
         light.x + shift[0] * .3,
         light.y + shift[1] * .3
       );
-      _v3_0[2] = 0.11;
+      _v3_0[2] = 0.0002;
       var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
       disk.draw(gl.TRIANGLES);
