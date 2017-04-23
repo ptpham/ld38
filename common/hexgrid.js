@@ -2,7 +2,7 @@
 import { vec2, vec3, mat2 } from 'gl-matrix';
 import _ from 'lodash';
 
-var shifts = [[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]]
+var shifts = [[1,0],[0,1],[-1,1],[-1,0],[0,-1],[1,-1]]
   .map(x => vec2.fromValues(x[0], x[1]));
 
 var _v2_0 = vec2.create();
@@ -78,7 +78,6 @@ export default class HexGrid {
   }
 
   static orientation(i0, j0, i1, j1) {
-    var shifts = [[1,0],[0,1],[-1,1],[-1,0],[0,-1],[1,-1]];
     var di = i1 - i0;
     var dj = j1 - j0;
     if (di == 1) {
