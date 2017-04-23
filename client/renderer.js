@@ -4,7 +4,7 @@ import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
 import { vec3, mat4 } from 'gl-matrix';
 import makeBox from 'geo-3d-box';
-import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
+import { Tiles, ROAD, WORK, HOME, TREE } from '../common/tiles';
 import { Cars } from '../common/cars';
 import { Teams } from '../common/teams';
 import { Lights } from '../common/lights';
@@ -13,6 +13,7 @@ import HexGrid from '../common/hexgrid';
 import { Mesh } from 'webgl-obj-loader';
 import carGeometry from './geometry/car';
 import houseGeometry from './geometry/house';
+import treeGeometry from './geometry/tree';
 import _ from 'lodash';
 
 var _v3_0 = vec3.create();
@@ -23,6 +24,7 @@ var CAR_SCALE = 0.12;
 var ROAD_SCALING = _.times(3, () => ROAD_SCALE);
 var CAR_MESH = new Mesh(carGeometry);
 var HOUSE_MESH = new Mesh(houseGeometry);
+var TREE_MESH = new Mesh(treeGeometry);
 var HOUSE_SCALINGS = [[0.15, 0.2, 0.2],[0.2,0.15,0.2],[0.2,0.2,0.15]];
 var OFFICE_MESH = makeBox({ size: 1 });
 var OFFICE_SCALINGS = [[0.3, 0.4, 0.6],[0.3,0.3,0.6],[0.4,0.6,0.6]];
@@ -72,6 +74,9 @@ export class Renderer {
     this.house = createGeometry(gl)
       .attr('positions', HOUSE_MESH.vertices)
       .faces(HOUSE_MESH.indices);
+    this.tree = createGeometry(gl)
+      .attr('positions', TREE_MESH.vertices)
+      .faces(TREE_MESH.indices);
     this.office = createGeometry(gl).attr('positions', OFFICE_MESH);
 
     this.view = mat4.create();
@@ -82,7 +87,7 @@ export class Renderer {
     this.highlight = null;
   }
   draw() {
-    var { gl, car, house, office, canvas, shader, camera, hex, disk, rect }  = this;
+    var { gl, car, house, office, tree, canvas, shader, camera, hex, disk, rect }  = this;
     resizeCanvas(gl, canvas);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -183,6 +188,15 @@ export class Renderer {
       var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.world = mat4.scale(world, world, OFFICE_SCALINGS[i]);
       office.draw(gl.TRIANGLES);
+    });
+
+    tree.bind(shader);
+    shader.uniforms.color = [0.2, 0.5, 0.3, 1];
+    Tiles.find({ type: TREE }).forEach((tile) => {
+      this.hexgrid.center(_v3_0, tile.x, tile.y);
+      var world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
+      tree.draw(gl.TRIANGLES);
     });
   }
 }
