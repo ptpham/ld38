@@ -9,6 +9,7 @@ import { Lights } from '../common/lights';
 import HexGrid from '../common/hexgrid';
 import { Mesh } from 'webgl-obj-loader';
 import carGeometry from './geometry/car';
+import houseGeometry from './geometry/house';
 import _ from 'lodash';
 
 var _v3_0 = vec3.create();
@@ -17,6 +18,7 @@ const RADIUS_COS30 = RADIUS*Math.cos(Math.PI/6);
 var ROAD_SCALE = 0.3;
 var ROAD_SCALING = _.times(3, () => ROAD_SCALE);
 var CAR_MESH = new Mesh(carGeometry);
+var HOUSE_MESH = new Mesh(houseGeometry);
 var DEGREES_60 = Math.PI/3;
 
 function resizeCanvas(gl, canvas) {
@@ -60,6 +62,9 @@ export class Renderer {
     this.car = createGeometry(gl)
       .attr('positions', CAR_MESH.vertices)
       .faces(CAR_MESH.indices);
+    this.house = createGeometry(gl)
+      .attr('positions', HOUSE_MESH.vertices)
+      .faces(HOUSE_MESH.indices);
 
     this.view = mat4.create();
     this.projection = mat4.create();
@@ -69,7 +74,7 @@ export class Renderer {
     this.highlight = null;
   }
   draw() {
-    var { gl, car, canvas, shader, camera, hex, disk, rect }  = this;
+    var { gl, car, house, canvas, shader, camera, hex, disk, rect }  = this;
     resizeCanvas(gl, canvas);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -152,6 +157,15 @@ export class Renderer {
       var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
       this.car.draw(gl.TRIANGLES);
+    });
+
+    house.bind(shader);
+    shader.uniforms.color = [0.9, 0.9, 1, 1];
+    Tiles.find({ type: HOME }).forEach(tile => {
+      this.hexgrid.center(_v3_0, tile.x, tile.y);
+      var world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
+      house.draw(gl.TRIANGLES);
     });
   }
 }
