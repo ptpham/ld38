@@ -30,7 +30,7 @@ var OFFICE_MESH = new Mesh(officeGeometry);
 var TREE_MESH = new Mesh(treeGeometry);
 var ROCK_MESH = new Mesh(rockGeometry);
 var HOUSE_SCALINGS = [[0.15, 0.2, 0.2],[0.2,0.15,0.2],[0.2,0.2,0.15]];
-var OFFICE_SCALINGS = [[0.3, 0.4, 0.4],[0.3,0.3,0.4],[0.4,0.6,0.4]];
+var OFFICE_SCALINGS = [[0.3, 0.4, 0.5],[0.3,0.3,0.4],[0.4,0.6,0.3]];
 var TREE_SCALINGS = [[0.2, 0.2, 0.2],[0.2,0.2,0.3],[0.15,0.15,0.4]];
 var ROCK_SCALINGS = [[0.1, 0.1, 0.1],[0.2,0.1,0.2],[0.1,0.2,0.2]];
 var DEGREES_60 = Math.PI/3;
@@ -100,6 +100,7 @@ export class Renderer {
     var { gl, car, house, office, tree, rock, canvas, shader, camera, hex, disk, rect }  = this;
     resizeCanvas(gl, canvas);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);
 
     var view = camera.view(this.view);
     var projection = mat4.perspective(this.projection,
@@ -137,6 +138,7 @@ export class Renderer {
     // Render road centers
     disk.bind(shader);
     shader.uniforms.color = [0.5, 0.5, 0.5, 1];
+    _v3_0[2] = 0.1;
     Tiles.find({ type: ROAD }).forEach(tile => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
@@ -168,6 +170,7 @@ export class Renderer {
         light.x + shift[0] * .3,
         light.y + shift[1] * .3
       );
+      _v3_0[2] = 0.11;
       var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
       disk.draw(gl.TRIANGLES);
@@ -186,6 +189,7 @@ export class Renderer {
       this.car.draw(gl.TRIANGLES);
     });
 
+    _v3_0[2] = 0;
     house.bind(shader);
     shader.uniforms.color = [0.9, 0.9, 1, 1];
     Tiles.find({ type: HOME }).forEach((tile, i) => {
