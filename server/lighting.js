@@ -13,6 +13,8 @@ export function createLight({ x, y, closed }) {
 
 export function switchLight(x, y) {
   const light = getLight(x, y);
+  if (!light) return;
+
   const closed = (light.closed + 1) % 3;
   return createLight({ x, y, closed });
 }

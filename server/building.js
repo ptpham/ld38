@@ -44,7 +44,7 @@ export function buildRoad(x, y) {
         paths: tile.paths
       });
 
-      if (tile.paths.length === 3) createLight({ x, y, closed: 0 });
+      if (tile.paths.length === 3) createLight({ x: tile.x, y: tile.y, closed: 0 });
     });
   }
 

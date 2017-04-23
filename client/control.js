@@ -1,5 +1,6 @@
 
 import { vec3, mat4 } from 'gl-matrix';
+import { Meteor } from 'meteor/meteor';
 
 var _v3_0 = vec3.create();
 var _v3_1 = vec3.create();
@@ -35,11 +36,18 @@ export class Control {
     var t = -eye[2] / _v3_0[2];
     var x = eye[0] + t*_v3_0[0];
     var y = eye[1] + t*_v3_0[1];
-    
+
     return this.hexgrid.lookup(_v3_1, x, y);
   }
 
+  moved() {
+    return Math.abs(this.lastX - this.firstX) > 10 ||
+      Math.abs(this.lastY - this.firstY) > 10;
+  }
+
   mousedown(e) {
+    this.firstX = e.clientX;
+    this.firstY = e.clientY;
     this.lastX = e.clientX;
     this.lastY = e.clientY;
   }
@@ -68,8 +76,14 @@ export class Control {
   }
 
   mouseup(e) {
+    if (!this.moved()) {
+      const coords = this.screenToHex(this.lastX, this.lastY);
+      Meteor.apply('switchLight', [coords[0], coords[1]], { wait: true });
+    }
     delete this.lastX;
     delete this.lastY;
+    delete this.firstX;
+    delete this.firstY;
   }
 
   addListeners() {
