@@ -76,5 +76,21 @@ export default class HexGrid {
     }
     return result;
   }
+
+  static orientation(i0, j0, i1, j1) {
+    var shifts = [[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]];
+    var di = i1 - i0;
+    var dj = j1 - j0;
+    if (di == 1) {
+      if (dj == -1) return 4;
+      else if (dj == 0) return 0;
+    } else if (di == 0) {
+      if (dj == -1) return 3;
+      else if (dj == 1) return 2;
+    } else if (di == -1) {
+      if (dj == 0) return 1;
+      else if (dj == 1) return 5;
+    }
+  }
 }
 
