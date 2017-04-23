@@ -88,6 +88,7 @@ export class Renderer {
     this.world = mat4.create();
 
     this.hexgrid = new HexGrid(vec3.fromValues(RADIUS_COS30,0));
+    this.lanes = new Lanes(this.hexgrid, CAR_SCALE);
     this.highlight = null;
   }
   draw() {
@@ -172,11 +173,9 @@ export class Renderer {
     Cars.find().forEach(car => {
       var tile = Tiles.findOne({ _id: car.currentTileId });
       if (tile == null) return;
-      this.hexgrid.center(_v3_0, tile.x, tile.y);
-      var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.color = Teams.findOne({ index: car.teamId }).color;
-      shader.uniforms.world = Lanes.applyLaneTransform(world,
-        car.orientation, car.leaving, CAR_SCALE);
+      shader.uniforms.world = this.lanes.applyLaneTransform(this.world,
+        car._id, tile.x, tile.y, car.orientation, car.leaving);
       this.car.draw(gl.TRIANGLES);
     });
 
