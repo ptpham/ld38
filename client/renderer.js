@@ -7,6 +7,7 @@ import makeBox from 'geo-3d-box';
 import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
 import { Cars } from '../common/cars';
 import { Lights } from '../common/lights';
+import Lanes from './lanes';
 import HexGrid from '../common/hexgrid';
 import { Mesh } from 'webgl-obj-loader';
 import carGeometry from './geometry/car';
@@ -17,6 +18,7 @@ var _v3_0 = vec3.create();
 const RADIUS = 1;
 const RADIUS_COS30 = RADIUS*Math.cos(Math.PI/6);
 var ROAD_SCALE = 0.3;
+var CAR_SCALE = 0.12;
 var ROAD_SCALING = _.times(3, () => ROAD_SCALE);
 var CAR_MESH = new Mesh(carGeometry);
 var HOUSE_MESH = new Mesh(houseGeometry);
@@ -160,7 +162,8 @@ export class Renderer {
       if (tile == null) return;
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
-      shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
+      shader.uniforms.world = Lanes.applyLaneTransform(world,
+        car.orientation, car.leaving, CAR_SCALE);
       this.car.draw(gl.TRIANGLES);
     });
 
