@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Matrix from 'ml-matrix';
 import floydWarshall from 'ml-floyd-warshall';
-import { Tiles, ROAD, getAdjacentTiles } from '../common/tiles';
+import { Tiles, ROAD } from '../common/tiles';
 import { getGameId } from '../common/games';
 
 export const pathing = {
@@ -52,15 +52,17 @@ export function findDistances() {
   return pathing;
 }
 
-export function findNextTile(x, y, x2, y2) {
+export function findNextTile(x, y, xG, yG, xF, yF) {
   let next = null;
   const start = getRoad({ x, y }).index;
-  const goal = getRoad({ x: x2, y: y2 }).index;
+  const goal = getRoad({ x: xG, y: yG }).index;
+  const from = getRoad({ x: xF, y: yF }).index;
   const min = pathing.dMatrix.get(start, goal);
   if (min === -1) return;
 
   const startAdjRow = pathing.aMatrix.getRow(start);
   for (let adj = 0; adj < startAdjRow.length; adj++) {
+    if (from === adj) continue; // ignore where it came from
     const sumCost = startAdjRow[adj] + pathing.dMatrix.get(adj, goal);
     if (sumCost === min) {
       next = adj;
