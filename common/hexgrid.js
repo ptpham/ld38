@@ -100,5 +100,7 @@ export default class HexGrid {
   static opposite(orientation) {
     return (orientation + 3) % 6;
   }
+
+  static get shifts() { return shifts; }
 }
 
