@@ -1,5 +1,6 @@
 
 import './main.html';
+import './scoreboard';
 import { Meteor } from 'meteor/meteor';
 import { Renderer } from './renderer';
 import { Control } from './control';
@@ -8,8 +9,9 @@ import _ from 'lodash';
 Meteor.startup(() => {
   let team = localStorage.getItem('team');
   if (team == null) {
-    team = _.sample([0, 1]);
-    localStorage.setItem('team', team);
+    Meteor.call('registerTeam', (team) => {
+      localStorage.setItem('team', team);
+    });
   }
 
   Meteor.subscribe('tiles');

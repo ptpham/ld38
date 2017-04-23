@@ -2,6 +2,39 @@
   <title>ld38</title>
 </head>
 <body>
+  <style>
+    .team {
+      pointer-events: none;
+      color: white;
+      padding: 1em;
+    }
+    .team.mine {
+      position: absolute;
+      top: 0;
+    }
+    .team.mine::before {
+      content: 'Team:';
+    }
+    .team.other {
+      font-size: 0.75em;
+      position: absolute;
+      top: 50px;
+    }
+    .team.other::before {
+      content: 'Opponent:';
+    }
+  </style>
+
+  {{#each teams}}
+    {{> score}}
+  {{/each}}
   <canvas id="canvas"></canvas>
 </body>
 
+<template name="score">
+  <div
+    class="team {{teamClass index}}"
+    style="background: {{background color}}">
+      {{resources}}
+  </div>
+</template>

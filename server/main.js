@@ -13,6 +13,7 @@ import { simulate } from './automata';
 Meteor.startup(() => {
   // code to run on server at startup
   const gameId = newGame();
+  let users = 0;
   generateMap(10, 10);
 
   Cars.rawCollection().createIndex({ homeTileId: 1, gameId: 1 });
@@ -28,7 +29,8 @@ Meteor.startup(() => {
     buildHome,
     buildRoad,
     switchLight,
-    toggleLight: (x, y) => toggleLight(x, y, true)
+    toggleLight: (x, y) => toggleLight(x, y, true),
+    registerTeam: () => { users++; return users % 2; }
   });
 
   findDistances();
