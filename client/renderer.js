@@ -28,6 +28,7 @@ var TREE_MESH = new Mesh(treeGeometry);
 var HOUSE_SCALINGS = [[0.15, 0.2, 0.2],[0.2,0.15,0.2],[0.2,0.2,0.15]];
 var OFFICE_MESH = makeBox({ size: 1 });
 var OFFICE_SCALINGS = [[0.3, 0.4, 0.6],[0.3,0.3,0.6],[0.4,0.6,0.6]];
+var TREE_SCALINGS = [[0.2, 0.2, 0.2],[0.2,0.2,0.3],[0.15,0.15,0.4]];
 var DEGREES_60 = Math.PI/3;
 
 function resizeCanvas(gl, canvas) {
@@ -177,7 +178,7 @@ export class Renderer {
     Tiles.find({ type: HOME }).forEach((tile, i) => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
-      shader.uniforms.world = mat4.scale(world, world, HOUSE_SCALINGS[i]);
+      shader.uniforms.world = mat4.scale(world, world, HOUSE_SCALINGS[i % 3]);
       house.draw(gl.TRIANGLES);
     });
 
@@ -186,16 +187,16 @@ export class Renderer {
     Tiles.find({ type: WORK }).forEach((tile, i) => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
-      shader.uniforms.world = mat4.scale(world, world, OFFICE_SCALINGS[i]);
+      shader.uniforms.world = mat4.scale(world, world, OFFICE_SCALINGS[i % 3]);
       office.draw(gl.TRIANGLES);
     });
 
     tree.bind(shader);
     shader.uniforms.color = [0.2, 0.5, 0.3, 1];
-    Tiles.find({ type: TREE }).forEach((tile) => {
+    Tiles.find({ type: TREE }).forEach((tile, i) => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
-      shader.uniforms.world = mat4.scale(world, world, ROAD_SCALING);
+      shader.uniforms.world = mat4.scale(world, world, TREE_SCALINGS[i % 3]);
       tree.draw(gl.TRIANGLES);
     });
   }
