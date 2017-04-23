@@ -6,13 +6,13 @@ export function getLight(x, y) {
   return Lights.findOne({ x, y, gameId });
 }
 
-export function createLight({ x, y, open }) {
+export function createLight({ x, y, closed }) {
   const gameId = getGameId();
-  return Lights.upsert({ x, y, gameId }, { $set: { open } });
+  return Lights.upsert({ x, y, gameId }, { $set: { closed } });
 }
 
 export function switchLight(x, y) {
   const light = getLight(x, y);
-  const newOpen = [light.open[1], (light.open[1] + 1) % 3];
-  return createLight({ x, y, open: newOpen });
+  const closed = (light.closed + 1) % 3;
+  return createLight({ x, y, closed });
 }
