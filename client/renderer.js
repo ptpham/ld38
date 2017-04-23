@@ -6,6 +6,7 @@ import { vec3, mat4 } from 'gl-matrix';
 import makeBox from 'geo-3d-box';
 import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
 import { Cars } from '../common/cars';
+import { Teams } from '../common/teams';
 import { Lights } from '../common/lights';
 import Lanes from './lanes';
 import HexGrid from '../common/hexgrid';
@@ -143,7 +144,6 @@ export class Renderer {
     disk.bind(shader);
     shader.uniforms.color = [1, 0.2, 0.3, 0.7];
     Lights.find().forEach((light) => {
-      const tile = Tiles.findOne({ x: light.x, y: light.y });
       var shift = HexGrid.shifts[light.closed];
       this.hexgrid.center(_v3_0,
         light.x + shift[0] * .3,
@@ -156,12 +156,12 @@ export class Renderer {
 
     // Render cars
     this.car.bind(shader);
-    shader.uniforms.color = [0.5, 0.5, 1, 1];
     Cars.find().forEach(car => {
       var tile = Tiles.findOne({ _id: car.currentTileId });
       if (tile == null) return;
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
+      shader.uniforms.color = Teams.findOne({ index: car.teamId }).color;
       shader.uniforms.world = Lanes.applyLaneTransform(world,
         car.orientation, car.leaving, CAR_SCALE);
       this.car.draw(gl.TRIANGLES);

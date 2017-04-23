@@ -15,6 +15,7 @@ Meteor.startup(() => {
   Meteor.subscribe('tiles');
   Meteor.subscribe('lights');
   Meteor.subscribe('cars');
+  Meteor.subscribe('teams');
   var canvas = document.getElementById('canvas');
   var renderer = new Renderer(canvas);
   var control = new Control(renderer);

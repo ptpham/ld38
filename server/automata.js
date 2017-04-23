@@ -86,7 +86,7 @@ export function simulate() {
   var gameId = getGameId();
   var homeTiles = Tiles.find({ type: HOME, gameId }).fetch();
   var workTiles = Tiles.find({ type: WORK, gameId }).fetch();
-  var teamId = 0;
+  var teamId = _.sample([0, 1]);
 
   for (var home of homeTiles) {
     if (!Cars.findOne({ gameId, homeTileId: home._id })) {
