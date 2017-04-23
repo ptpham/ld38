@@ -28,7 +28,7 @@ Meteor.startup(() => {
     buildHome,
     buildRoad,
     switchLight,
-    toggleLight
+    toggleLight: (x, y) => toggleLight(x, y, true)
   });
 
   findDistances();
