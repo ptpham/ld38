@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { newGame } from '../common/games';
-import { Tiles } from '../common/tiles';
+import { Tiles, TILE_COSTS, HOME, ROAD,
+  canBuyRoad, canBuyHome} from '../common/tiles';
 import { Lights } from '../common/lights';
 import { Cars } from '../common/cars';
 import { Teams } from '../common/teams';
@@ -27,8 +28,18 @@ Meteor.startup(() => {
   Meteor.publish('cars', () => Cars.find({ gameId }));
   Meteor.publish('teams', () => Teams.find({ gameId }));
   Meteor.methods({
-    buildHome: (x, y, teamId) => buildHome(x, y, teamId, true),
-    buildRoad: (x, y) => buildRoad(x, y, true),
+    buildHome: (x, y, index) => {
+      const resources = Teams.findOne({ gameId, index }).resources;
+      if (!canBuyHome(resources)) return;
+      Teams.update({ gameId, index }, { $set: { resources: resources - TILE_COSTS[HOME] } });
+      buildHome(x, y, index, true);
+    },
+    buildRoad: (x, y, index) => {
+      const resources = Teams.findOne({ gameId, index }).resources;
+      if (!canBuyRoad(resources)) return;
+      Teams.update({ gameId, index }, { $set: { resources: resources - TILE_COSTS[ROAD] } });
+      buildRoad(x, y, true);
+    },
     harvestTile,
     switchLight,
     getGameId,

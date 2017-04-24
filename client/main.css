@@ -43,27 +43,35 @@ canvas { width: 100vw; height: 100vh; }
 #build-overlay {
   transition: opacity 0.2s;
   position: absolute;
-  display: flex;
   top: 0; bottom: 0; left: 0; right: 0;
   opacity: 0;
   pointer-events: none;
+  display: none;
 }
 
 #build-overlay.visible {
   opacity: 1;
   pointer-events: all;
+  display: flex;
 }
 
 #build-overlay > div {
-  background: white;
-  border: 1px solid #ccc;
-  width: 50%;
   text-align: center;
   margin: auto;
-  padding: 20px;
+  display: flex;
 }
 
 #build-overlay button {
   width: 100px;
   height: 40px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.build {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid white;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 4px;
 }

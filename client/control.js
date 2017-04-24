@@ -1,10 +1,10 @@
 
 import { vec3, mat4 } from 'gl-matrix';
 import { Meteor } from 'meteor/meteor';
-import { Tiles, canBuildHome, canBuildRoad, ROAD, WORK } from '../common/tiles';
+import { Tiles, ROAD, WORK } from '../common/tiles';
 import { Lights } from '../common/lights';
 import { harvestParams } from './harvest';
-import { buildParams } from './build';
+import { buildParams, buildable } from './build';
 import HexGrid from '../common/hexgrid';
 import _ from 'lodash';
 
@@ -147,7 +147,7 @@ export class Control {
     if (tile.type === ROAD && this.renderer.proposeLight != null) {
       var args = [tile.x, tile.y, this.renderer.proposeLight];
       Meteor.apply('switchLight', args, { wait: true });
-    } else if (canBuildHome(tile) || canBuildRoad(tile)) {
+    } else if (buildable(tile)) {
       buildParams.set('tile', tile);
       buildParams.set('show', true);
     }
