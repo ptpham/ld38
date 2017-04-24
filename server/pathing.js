@@ -10,6 +10,7 @@ export const pathing = { };
 
 export function resetPathingState() {
   pathing.cMatrix = new Map();
+  pathing.traversable = new Set();
   pathing.mapDown = new Map();
   pathing.mapUp = null;
   pathing.dMatrix = null;
@@ -22,8 +23,10 @@ export function findDistances() {
   var { cMatrix } = pathing;
 
   if (tiles.length == 0) return pathing;
-  var aMatrix = Matrix.zeros(tiles.length, tiles.length);
+  var aMatrix = Matrix.from1DArray(tiles.length, tiles.length,
+    _.times(tiles.length*tiles.length, () => Infinity));
   var mapDown = new Map();
+  var traversable = new Set();
   var mapUp = [];
 
   function lookup(z) {
@@ -42,17 +45,19 @@ export function findDistances() {
       const ai = lookup(other.index);
       aMatrix.set(i, ai, cMatrix.get(cantorZ(tile.index, other.index)) || 1);
       aMatrix.set(ai, i, cMatrix.get(cantorZ(other.index, tile.index)) || 1);
+      traversable.add(cantorZ(i, ai));
     });
   });
 
   pathing.mapUp = mapUp;
   pathing.mapDown = mapDown;
   pathing.dMatrix = floydWarshall(aMatrix);
+  pathing.traversable = traversable;
   return pathing;
 }
 
 export function findNextTile(x, y, xG, yG, xF, yF) {
-  var { cMatrix, dMatrix, mapDown, mapUp } = pathing;
+  var { cMatrix, dMatrix, mapDown, mapUp, traversable } = pathing;
 
   let next = null;
   const start = mapDown.get(cantorZ(x, y));
@@ -68,7 +73,9 @@ export function findNextTile(x, y, xG, yG, xF, yF) {
     if (from != null && from == adj) continue; // ignore where it came from
     var edgeCost = cMatrix.get(cantorZ(start, adj)) || 1;
     if (!mapDown.has(adj)) continue;
-    var farCost = dMatrix.get(mapDown.get(adj), goal);
+    var adjDown = mapDown.get(adj);
+    if (!traversable.has(cantorZ(start, adjDown))) continue;
+    var farCost = dMatrix.get(adjDown, goal);
     if (farCost == -1) continue;
     const sumCost = edgeCost + farCost;
     if (sumCost == min) {
