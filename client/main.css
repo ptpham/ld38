@@ -20,25 +20,38 @@ canvas { width: 100vw; height: 100vh; }
   display: none;
 }
 
+.team svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: -1;
+  stroke: white;
+  stroke-width: 10;
+}
+.team div {
+  margin: auto;
+  white-space: nowrap;
+}
 .team {
   pointer-events: none;
   color: white;
-  padding: 1em;
+  display: flex;
+  align-items: center;
 }
 .team.mine {
   position: absolute;
-  top: 0;
-}
-.team.mine::before {
-  content: 'Team:';
+  top: 10px;
+  left: 10px;
+  width: 100px;
+  height: 100px;
 }
 .team.other {
-  font-size: 0.75em;
+  font-size: 0.5em;
   position: absolute;
-  top: 50px;
-}
-.team.other::before {
-  content: 'Opponent:';
+  top: 110px;
+  left: 35px;
+  width: 50px;
+  height: 50px;
 }
 
 #build-overlay {
@@ -64,7 +77,6 @@ canvas { width: 100vw; height: 100vh; }
 
 #build-overlay button {
   width: 100px;
-  height: 40px;
   display: block;
   margin-bottom: 5px;
 }
@@ -81,7 +93,6 @@ canvas { width: 100vw; height: 100vh; }
   position: absolute;
   top: 0; bottom: 0; left: 0; right: 0;
   display: flex;
-  font-size: 0.9em;
 }
 
 #intro-overlay.hidden {
@@ -103,10 +114,10 @@ canvas { width: 100vw; height: 100vh; }
 
 #intro-overlay > div {
   width: 80%;
-  height: 80%;
   margin: auto;
   background: rgba(255, 255, 255, 0.5);
   border: 1px solid white;
+  border-radius: 4px;
   padding: 10px;
 }
 
@@ -118,4 +129,12 @@ canvas { width: 100vw; height: 100vh; }
   background: white;
   margin-bottom: 10px;
   padding: 10px;
+}
+
+span, p {
+  font-size: 0.8em;
+}
+
+button {
+  font-size: 1.1em;
 }

@@ -14,9 +14,9 @@
 
 <template name="score">
   <div
-    class="team {{teamClass index}}"
-    style="background: {{background index}}">
-      {{resources}}
+    class="team {{teamClass index}}">
+    <svg style="fill:{{ background index }}" viewbox="0 0 300 300">{{> hexagon}}</svg>
+    <div>{{resources}}</div>
   </div>
 </template>
 
