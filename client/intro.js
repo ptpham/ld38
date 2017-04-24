@@ -1,6 +1,7 @@
 import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
 import { TEAM_COLORS } from '../common/teams';
+import { HOME, ROAD, TILE_COSTS } from '../common/tiles';
 
 export const introParams = new ReactiveDict();
 introParams.set('hide', true);
@@ -23,7 +24,9 @@ Template.intro.helpers({
     const color = TEAM_COLORS[(Number(team) + 1) % 2];
     const str = color.slice(0, 3).map(c => Math.round(c*255)).join(',');
     return `rgb(${str})`;
-  }
+  },
+  homeCost() { return TILE_COSTS[HOME]; },
+  roadCost() { return TILE_COSTS[ROAD]; }
 });
 
 Template.intro.events({
