@@ -6,9 +6,12 @@ import HexGrid from '../common/hexgrid';
 import { createLight } from './lighting';
 import { cantorZ } from '../common/pairing';
 
-function pushPath(src, dst) {
-  return Tiles.update({ _id: src._id }, { $push: { 'paths': dst._id },
-    $inc: { roads: dst.type == ROAD ? 1 : 0 } }, () => {
+function pushPath(src, dst, roadsOnly) {
+  let update = { $inc: { roads: dst.type == ROAD ? 1 : 0 } };
+  if (!roadsOnly) {
+    update = Object.assign(update, { $push: { 'paths': dst._id } });
+  }
+  return Tiles.update({ _id: src._id }, update, () => {
       checkStopLight(src._id);
   });
 }
@@ -38,6 +41,9 @@ export function updatePaths(tile, adjacent) {
       pushPath(tile, other);
       pushPath(other, tile);
       if (tile.type != ROAD) return;
+    } else {
+      pushPath(tile, other, true);
+      pushPath(other, tile, true);
     }
   }
 }
@@ -48,6 +54,7 @@ export function build({ x, y, type }) {
 
   var adjacentIndexes = HexGrid.shifts.map(shift =>
     cantorZ(x + shift[0], y + shift[1]));
+  var allAdjacent = Tiles.find({ gameId, index: { $in: adjacentIndexes } }).fetch();
   var adjacentTiles = Tiles.find({ gameId, type: { $in: [WORK, ROAD, HOME] },
     index: { $in: adjacentIndexes } }).fetch();
   var adjacentRoads = _.filter(adjacentTiles, tile => tile.type == ROAD);
@@ -55,21 +62,21 @@ export function build({ x, y, type }) {
 
   return Tiles.upsert({ x, y, gameId }, { $set: { type, index } }, err => {
     var tile = Tiles.findOne({ gameId, index });
-    updatePaths(tile, adjacentTiles);
+    updatePaths(tile, allAdjacent);
   });
 }
 
 export function buildRoad(x, y, check) {
   const gameId = getGameId();
   const tile = Tiles.findOne({ x, y, gameId });
-  if (canBuildRoad(tile) || !check) {
+  if (!check || canBuildRoad(tile)) {
     build({ x, y, type: ROAD });
   }
 }
 export function buildHome(x, y, teamId, check) {
   const gameId = getGameId();
   const tile = Tiles.findOne({ x, y, gameId });
-  if (canBuildHome(tile) || !check) {
+  if (!check || canBuildHome(tile)) {
     build({ x, y, type: HOME });
     Tiles.upsert({ x, y, gameId }, { $set: { teamId } });
   }

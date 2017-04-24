@@ -147,7 +147,7 @@ export class Control {
     if (tile.type === ROAD && this.renderer.proposeLight != null) {
       var args = [tile.x, tile.y, this.renderer.proposeLight];
       Meteor.apply('switchLight', args, { wait: true });
-    } else if (buildable(tile)) {
+    } else if (buildable(tile) && !buildParams.get('show')) {
       buildParams.set('tile', tile);
       buildParams.set('show', true);
     }

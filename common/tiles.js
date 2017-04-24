@@ -27,7 +27,7 @@ export function canBuyHome(resources) {
 }
 
 export function canBuildRoad(tile) {
-  return tile.roads > 0 && tile.paths.length < 3 &&
+  return tile.roads > 0 && tile.roads < 3 &&
     tile.type in BUILDABLE_SET;
 }
 

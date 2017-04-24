@@ -5,7 +5,7 @@ import { getGameId } from '../common/games';
 
 export function harvestTile(tileId, teamId) {
   var tile = Tiles.findOne({ _id: tileId });
-  if (tile == null || tile.type != WORK) return;
+  if (tile == null || tile.type != WORK || !tile.resources) return;
 
   var amount = Math.min(tile.resources[teamId], MAX_RESOURCES);
   if (amount == 0 || amount == null || Number.isNaN(amount)) return;
