@@ -20,7 +20,7 @@ function checkStopLight(tileId) {
   var tile = Tiles.findOne({ _id: tileId });
   if (tile.type != ROAD) return;
 
-  if (tile.roads == 3) {
+  if (tile.paths.length == 3) {
     var adjacentRoads = Tiles.find({ _id: { $in: tile.paths }, type: ROAD }).fetch();
     var closedTile = Tiles.findOne({ _id: _.sample(adjacentRoads)._id });
 
