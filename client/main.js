@@ -6,6 +6,8 @@ import { Template } from 'meteor/templating';
 import { Renderer } from './renderer';
 import { Control } from './control';
 import { Teams } from '../common/teams';
+import { Tiles } from '../common/tiles';
+import { vec3 } from 'gl-matrix';
 
 Template.body.helpers({
   teams() { return Teams.find(); }
@@ -26,13 +28,19 @@ Meteor.startup(() => {
       });
     }
 
-    Meteor.subscribe('tiles');
-    Meteor.subscribe('lights');
-    Meteor.subscribe('cars');
-    Meteor.subscribe('teams');
     var canvas = document.getElementById('canvas');
     var renderer = new Renderer(canvas);
     var control = new Control(renderer);
+
+    Meteor.subscribe('tiles', () => {
+      var sum = 0;
+      Tiles.find().forEach(tile => sum += tile.x);
+      var center = sum/Tiles.find().count();
+      renderer.camera.translate(vec3.fromValues(center, center, 0));
+    });
+    Meteor.subscribe('lights');
+    Meteor.subscribe('cars');
+    Meteor.subscribe('teams');
 
     function raf() {
       renderer.draw();
