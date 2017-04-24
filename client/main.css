@@ -4,6 +4,7 @@ body {
   margin: 0px;
   font-family: helvetica;
   overflow: hidden;
+  background: rgb(84, 174, 190);
 }
 canvas { width: 100vw; height: 100vh; }
 
