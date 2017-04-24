@@ -8,7 +8,7 @@ import { cantorZ } from '../common/pairing';
 
 function pushPath(src, dst) {
   return Tiles.update({ _id: src._id }, { $push: { 'paths': dst._id },
-    $inc: { roads: 1 } }, () => {
+    $inc: { roads: dst.type == ROAD ? 1 : 0 } }, () => {
       checkStopLight(src._id);
   });
 }

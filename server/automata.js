@@ -29,8 +29,8 @@ export function assignDestination(car) {
   car.dstTileId = dstTileId;
 }
 
-export function checkSlotOpen(tile, orientation, leaving) {
-  return Cars.findOne({ currentTileId: tile._id,
+export function checkSlotOpen(tileId, orientation, leaving) {
+  return Cars.findOne({ currentTileId: tileId,
     orientation, leaving, gameId: getGameId() }) == null;
 }
 
@@ -99,7 +99,10 @@ export function simulate() {
     if (car.workTileId == null) assignWork(workTiles, car);
     assignDestination(car);
     moveCar(car, routeCar(car));
-    Cars.update({ _id: car._id, gameId  }, { $set: car });
+
+    if (checkSlotOpen(car.currentTileId, car.orientation, car.leaving)) {
+      Cars.update({ _id: car._id, gameId  }, { $set: car });
+    }
   }
 }
 
