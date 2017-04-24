@@ -1,18 +1,19 @@
 
 import { Teams } from '../common/teams';
-import { Tiles, WORK } from '../common/tiles';
+import { Tiles, WORK, MAX_RESOURCES } from '../common/tiles';
 import { getGameId } from '../common/games';
 
-export function harvestTile(teamId, x, y) {
-  var tile = Tiles.findOne({ gameId, x, y });
+export function harvestTile(tileId, teamId) {
+  var tile = Tiles.findOne({ _id: tileId });
   if (tile == null || tile.type != WORK) return;
 
-  var amount = tile.resources[teamId];
-  if (amount == 0 || amount == null) return;
+  var amount = Math.min(tile.resources[teamId], MAX_RESOURCES);
+  if (amount == 0 || amount == null || Number.isNaN(amount)) return;
 
   var set = { };
+  var gameId = getGameId();
   set['resources.' + teamId] = 0;
   Tiles.update({ _id: tile._id }, { $set: set });
-  Teams.update({ _id: teamId }, { $inc: amount });
+  Teams.update({ gameId, index: +teamId }, { $inc: { resources: amount } });
 }
 

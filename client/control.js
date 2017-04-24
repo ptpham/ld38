@@ -130,6 +130,12 @@ export class Control {
       const coords = this.screenToHex(this.lastX, this.lastY);
       const tile = Tiles.findOne({ x: coords[0], y: coords[1] });
       this.perform(tile);
+      
+      var harvestTileId = harvestParams.get('tileId', null);
+      if (harvestTileId != null) {
+        var teamId = localStorage.getItem('team');
+        Meteor.call('harvestTile', harvestTileId, teamId);
+      }
     }
     delete this.lastX;
     delete this.lastY;
