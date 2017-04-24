@@ -77,12 +77,12 @@ function moveCar(car, route) {
   return car;
 }
 
-export function createCar(homeTile, teamId) {
+export function createCar(homeTile) {
   var gameId = getGameId();
   var homeTileId = homeTile._id;
   var currentTileId = homeTileId;
   return Cars.upsert({ homeTileId, gameId },
-    { $set: { currentTileId, teamId } });
+    { $set: { currentTileId, teamId: homeTile.teamId } });
 }
 
 export function simulate() {
@@ -92,7 +92,7 @@ export function simulate() {
 
   for (var home of homeTiles) {
     if (!Cars.findOne({ gameId, homeTileId: home._id })) {
-      createCar(home, home.teamId);
+      createCar(home);
     }
 
     var car = Cars.findOne({ homeTileId: home._id });

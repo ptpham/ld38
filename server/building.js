@@ -28,7 +28,7 @@ export function build({ x, y, type }, stop) {
   var paths = pathables.map(x => x._id);
 
   var result = Tiles.upsert({ x, y, gameId }, { $set: { type, paths, roads, index } });
-  if (!stop) _.each(pathables, tile => build(tile, true));
+  if (!stop) _.each(adjacentTiles, tile => build(tile, true));
   return result;
 }
 

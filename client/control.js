@@ -112,15 +112,25 @@ export class Control {
   }
 
   mouseup(e) {
-    if (!this.moved() && this.renderer.proposeLight != null) {
+    if (!this.moved()) {
       const coords = this.screenToHex(this.lastX, this.lastY);
-      var args = [coords[0], coords[1], this.renderer.proposeLight];
-      Meteor.apply('switchLight', args, { wait: true });
+      const tile = Tiles.findOne({ x: coords[0], y: coords[1] });
+      this.perform(tile);
     }
     delete this.lastX;
     delete this.lastY;
     delete this.firstX;
     delete this.firstY;
+  }
+
+  perform(tile) {
+    if (tile.type === ROAD && this.renderer.proposeLight != null) {
+      var args = [tile.x, tile.y, this.renderer.proposeLight];
+      Meteor.apply('switchLight', args, { wait: true });
+    } else {
+      const teamId = localStorage.getItem('team');
+      Meteor.apply('buildHome', [tile.x, tile.y, teamId], { wait: true });
+    }
   }
 
   addListeners() {
