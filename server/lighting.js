@@ -1,5 +1,5 @@
 import { Lights, LIGHT_CD, LIGHT_WAIT } from '../common/lights';
-import { getGameId } from '../common/games';
+import { getGameId } from './games';
 import { Tiles } from '../common/tiles';
 import HexGrid from '../common/hexgrid';
 import _ from 'lodash';

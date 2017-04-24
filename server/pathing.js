@@ -2,24 +2,26 @@ import _ from 'lodash';
 import Matrix from 'ml-matrix';
 import floydWarshall from 'ml-floyd-warshall';
 import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
-import { getGameId } from '../common/games';
+import { getGameId } from './games';
 import { cantorXY, cantorZ } from '../common/pairing';
 import HexGrid from '../common/hexgrid';
 
-export const pathing = {
-  // cost matrix
-  cMatrix: new Map(),
-  mapDown: new Map(),
-  mapUp: null,
-  // distance matrix
-  dMatrix: null
-};
+export const pathing = { };
+
+export function resetPathingState() {
+  pathing.cMatrix = new Map();
+  pathing.mapDown = new Map();
+  pathing.mapUp = null;
+  pathing.dMatrix = null;
+}
+resetPathingState();
 
 export function findDistances() {
   const tiles = Tiles.find({ gameId: getGameId(),
     type: { $in: [ROAD, WORK, HOME] } }).fetch();
   var { cMatrix } = pathing;
 
+  if (tiles.length == 0) return pathing;
   var aMatrix = Matrix.zeros(tiles.length, tiles.length);
   var mapDown = new Map();
   var mapUp = [];

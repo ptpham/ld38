@@ -1,7 +1,7 @@
 
 import { Teams } from '../common/teams';
 import { Tiles, WORK, MAX_RESOURCES } from '../common/tiles';
-import { getGameId } from '../common/games';
+import { getGameId } from './games';
 
 export function harvestTile(tileId, teamId) {
   var tile = Tiles.findOne({ _id: tileId });

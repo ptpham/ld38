@@ -15,7 +15,7 @@ Template.body.helpers({
 });
 
 Meteor.startup(() => {
-  Meteor.call('getGameId', gameId => {
+  Meteor.call('getGameId', (err, gameId) => {
     if (gameId != localStorage.getItem('gameId')) {
       localStorage.clear();
     }
@@ -36,21 +36,22 @@ Meteor.startup(() => {
     var renderer = new Renderer(canvas);
     var control = new Control(renderer);
 
-    Meteor.subscribe('tiles', () => {
+    Meteor.subscribe('tiles', gameId, () => {
       var sum = 0;
       Tiles.find().forEach(tile => sum += tile.x);
       var center = sum/Tiles.find().count();
       renderer.camera.translate(vec3.fromValues(center, center, 0));
-    });
-    Meteor.subscribe('lights');
-    Meteor.subscribe('cars');
-    Meteor.subscribe('teams');
 
-    function raf() {
-      renderer.draw();
+      function raf() {
+        renderer.draw();
+        requestAnimationFrame(raf);
+      }
       requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-    control.addListeners();
+      control.addListeners();
+    });
+    Meteor.subscribe('lights', gameId);
+    Meteor.subscribe('cars', gameId);
+    Meteor.subscribe('teams', gameId);
+    Meteor.subscribe('games', gameId);
   });
 });

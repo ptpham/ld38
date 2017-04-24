@@ -94,3 +94,14 @@
 <template name="hexagon">
   <polygon class="hex" points="300,150 225,280 75,280 0,150 75,20 225,20"></polygon>
 </template>
+
+<template name="gameOver">
+  <div>
+    The game starting at <span class="time">{{timeBegin}}</span> and ending at
+    <span class="time">{{timeEnd}}</span> that you were playing previously is
+    now over. The final score is as follows:
+    <span>{{team0Score}}</span><span>{{team1Score}}</span>
+    <button>Join New Game</button>
+  </div>
+</template>
+

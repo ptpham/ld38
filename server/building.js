@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { Tiles, canBuildHome, canBuildRoad, BUILDABLE_SET,
   TREE, ROCK, AQUA, NONE, WORK, HOME, ROAD } from '../common/tiles';
-import { getGameId } from '../common/games';
+import { getGameId } from './games';
 import HexGrid from '../common/hexgrid';
 import { createLight } from './lighting';
 import { cantorZ } from '../common/pairing';

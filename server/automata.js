@@ -4,7 +4,7 @@ import HexGrid from '../common/hexgrid';
 import { Cars } from '../common/cars';
 import { Tiles, ROAD, WORK, HOME } from '../common/tiles';
 import lighting from './lighting';
-import { getGameId } from '../common/games';
+import { getGameId } from './games';
 import { cantorZ, cantorXY } from '../common/pairing';
 import pathing from './pathing';
 
