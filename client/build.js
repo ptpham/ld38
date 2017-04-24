@@ -20,7 +20,9 @@ Template.build.helpers({
     const show = buildParams.get('show');
     const tile = buildParams.get('tile');
     const canBuild = tile && (canBuildHome(tile) || canBuildRoad(tile));
-    return canBuild && show ? 'visible' : '';
+    const visible = canBuild && show;
+    buildParams.set('show', visible);
+    return visible ? 'visible' : '';
   }
 });
 
