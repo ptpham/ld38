@@ -18,7 +18,7 @@ export const TILE_COSTS = {
 };
 
 export function canBuildHome(tile) {
-  return tile.roads == 1 && tile.type in BUILDABLE_SET;
+  return tile.roads > 0 && tile.type in BUILDABLE_SET;
 }
 
 export function canBuyHome(resources) {

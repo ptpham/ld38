@@ -6,14 +6,23 @@ import HexGrid from '../common/hexgrid';
 import { createLight } from './lighting';
 import { cantorZ } from '../common/pairing';
 
-function pushPath(src, dst, roadsOnly) {
-  let update = { $inc: { roads: dst.type == ROAD ? 1 : 0 } };
-  if (!roadsOnly) {
-    update = Object.assign(update, { $push: { 'paths': dst._id } });
+function pushPath(src, dst) {
+  var bothRoad = src.type == ROAD && dst.type == ROAD;
+  var singleUnconnected = dst.type == ROAD
+    && (src.type == WORK || src.type == HOME)
+    && (src.paths == null || src.paths.length < 1);
+  
+  if (src.type == ROAD) {
+    Tiles.update({ _id: dst._id }, { $inc: { roads: 1 } });
   }
-  return Tiles.update({ _id: src._id }, update, () => {
-      checkStopLight(src._id);
-  });
+
+  if (singleUnconnected || bothRoad) {
+    Tiles.update({ _id: dst._id }, { $push: { 'paths': src._id } },
+      () => { checkStopLight(dst._id); });
+    Tiles.update({ _id: src._id }, { $push: { 'paths': dst._id } },
+      () => { checkStopLight(src._id); });
+    src.paths = (src.paths || []).push(dst._id);
+  }
 }
 
 function checkStopLight(tileId) {
@@ -33,19 +42,9 @@ function checkStopLight(tileId) {
 
 export function updatePaths(tile, adjacent) {
   if (tile == null) return;
-  if (tile.type != WORK && tile.type != HOME && tile.type != ROAD) return;
-  if (tile.type != ROAD && _.get(tile, 'paths.length') > 0) return;
-
   adjacent = _.shuffle(Array.from(adjacent));
   for (var other of adjacent) {
-    if (other.type == ROAD) {
-      pushPath(tile, other);
-      pushPath(other, tile);
-      if (tile.type != ROAD) return;
-    } else {
-      pushPath(tile, other, true);
-      pushPath(other, tile, true);
-    }
+    pushPath(tile, other);
   }
 }
 
@@ -128,5 +127,4 @@ export function expandWork() {
 
   if (found != null) buildWork(found.x, found.y);
 }
-
 
