@@ -2,14 +2,17 @@
   <title>ld38</title>
 </head>
 <body>
+  <div id="scoreboard">
   {{#each teams}}
     {{> score}}
   {{/each}}
+  </div>
   <canvas id="canvas"></canvas>
   <audio src="ld38.mp3" autoplay loop></audio>
   {{> harvest }}
   {{> build}}
   {{> intro}}
+  {{> gameOver}}
 </body>
 
 <template name="score">
@@ -45,33 +48,36 @@
   <div id="intro-overlay" class="{{isHidden}}">
     <div>
       <p>
-      Welcome new ground traffic controller!
+      Welcome to your new job as a collaborative, distributed, ground traffic controller!
       <br /><br />
-      Your goal is to help your fellow sheep-- I mean citizens get to and from
-      their home and workplace.
+      Your goal is to help fellow citizens get to and from their home and
+      workplace.
       </p>
 
       <div class="home">
         <svg style="fill:{{ teamColor }}" viewbox="0 0 300 300">{{> hexagon}}</svg>
         <p>
-          These tiles are their homes.
+          These tiles represent the homes of citizens on your team.
         </p>
       </div>
 
       <div class="work">
         <svg style="fill: rgb(255, 206, 58)" viewbox="0 0 300 300">{{> hexagon}}</svg>
         <p>
-          These tiles are their workplaces.
+          These tiles are workplaces. Each citizen will randomly be assigned a
+          workplace. They will continue to work there for the rest of their
+          lives.
           <br /><br />
-          Taxes are accumulated at these locations. Click them to collect the taxes.
+          Taxes are accumulated at these locations when your citizens make a
+          complete loop from their workplace to their home. Click on them to
+          collect the taxes for your team.
         </p>
       </div>
 
       <div class="rival">
         <svg style="fill:{{ rivalColor }}" viewbox="0 0 300 300">{{> hexagon}}</svg>
         <p>
-          These are the homes of our rivals.
-          <br /><br />
+          These are the homes of citizens on our rival team.
           Try to make their commutes extra terrible.
         </p>
       </div>
@@ -79,11 +85,14 @@
       <p>
         Road intersections will have stop lights.
         Click on a path in the intersection to change the light.
+        They will switch randomly so keep an eye on them for optimal traffic management!
         <br /><br />
         As you collect taxes, you'll be able to contruct new homes or roads on the map.
         Click on a tile near a road to begin the process. It costs
         <b>{{ roadCost }} to build a road</b> and
         <b>{{ homeCost }} to build a home</b>.
+        <br/><br/>
+        Drag your mouse to move and hold shift to rotate the camera.
       </p>
 
       <button>Got it!</button>
@@ -96,12 +105,20 @@
 </template>
 
 <template name="gameOver">
-  <div>
-    The game starting at <span class="time">{{timeBegin}}</span> and ending at
-    <span class="time">{{timeEnd}}</span> that you were playing previously is
-    now over. The final score is as follows:
-    <span>{{team0Score}}</span><span>{{team1Score}}</span>
-    <button>Join New Game</button>
+  <div id="game-over" class="{{isHidden}}">
+    <div style="text-align:center">The game that you were previously playing is now over!</div>
+    <div class="row"><span>Start Time</span><span>{{timeBegin}}</span></div>
+    <div class="row"><span>End Time</span><span>{{timeEnd}}</span></div>
+    <div class="row"><span>Total number of players</span><span>{{users-1}}</span></div>
+    <div class="row dimmed">
+      <span>Final Score</span>
+      <div class="scoreboard">
+      {{#each teams}}
+        {{> score}}
+      {{/each}}
+      </div>
+    </div>
+    <div style="display: flex; justify-content: center"><button>Join Current Game</button></div>
   </div>
 </template>
 

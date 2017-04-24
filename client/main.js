@@ -9,6 +9,8 @@ import { Control } from './control';
 import { Teams } from '../common/teams';
 import { Tiles } from '../common/tiles';
 import { vec3 } from 'gl-matrix';
+import { gameMeta } from './gameOver';
+import { Games } from '../common/games';
 
 Template.body.helpers({
   teams() { return Teams.find(); }
@@ -16,11 +18,14 @@ Template.body.helpers({
 
 Meteor.startup(() => {
   Meteor.call('getGameId', (err, gameId) => {
-    if (gameId != localStorage.getItem('gameId')) {
-      localStorage.clear();
+    var localGameId = localStorage.getItem('gameId');
+    if (localGameId  == null) {
+      localStorage.setItem('gameId', gameId);
+    } else {
+      gameId = localGameId;
     }
 
-    localStorage.setItem('gameId', gameId);
+    gameMeta.set('gameId', gameId);
     let team = localStorage.getItem('team');
 
     if (team == null) {

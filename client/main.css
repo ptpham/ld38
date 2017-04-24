@@ -6,6 +6,7 @@ body {
   overflow: hidden;
   background: rgb(84, 174, 190);
 }
+* { font-weight: lighter; }
 canvas { width: 100vw; height: 100vh; }
 
 #harvest-overlay {
@@ -13,7 +14,7 @@ canvas { width: 100vw; height: 100vh; }
   display: flex;
   position: absolute;
   opacity: 1;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.85);
   border: 1px solid white;
   border-radius: 4px;
   padding: 10px;
@@ -29,7 +30,7 @@ canvas { width: 100vw; height: 100vh; }
 }
 
 .team svg {
-  width: 100%;
+  width: 110%;
   height: 100%;
   position: absolute;
   z-index: -1;
@@ -45,21 +46,30 @@ canvas { width: 100vw; height: 100vh; }
   color: white;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 .team.mine {
   position: absolute;
-  top: 10px;
-  left: 10px;
   width: 100px;
   height: 100px;
+  font-size: 50px;
 }
+
+#scoreboard .team.mine {
+  top: 10px;
+  left: 10px;
+}
+
 .team.other {
-  font-size: 0.5em;
+  font-size: 20px;
   position: absolute;
-  top: 110px;
-  left: 35px;
   width: 50px;
   height: 50px;
+}
+
+#scoreboard .team.other {
+  top: 110px;
+  left: 35px;
 }
 
 #build-overlay {
@@ -90,7 +100,7 @@ canvas { width: 100vw; height: 100vh; }
 }
 
 .build {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.85);
   border: 1px solid white;
   padding: 10px;
   margin: 5px;
@@ -106,6 +116,8 @@ canvas { width: 100vw; height: 100vh; }
 #intro-overlay.hidden {
   display: none;
 }
+
+svg { flex-shrink: 0; }
 
 #intro-overlay svg {
   height: 30px;
@@ -123,10 +135,10 @@ canvas { width: 100vw; height: 100vh; }
 #intro-overlay > div {
   width: 80%;
   margin: auto;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.85);
   border: 1px solid white;
   border-radius: 4px;
-  padding: 10px;
+  padding: 40px;
 }
 
 #intro-overlay .home,
@@ -162,4 +174,65 @@ span, p {
 
 button {
   font-size: 1.1em;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 5px 20px;
+  background: white;
+  border: 1px solid gray;
+  transition: box-shadow 0.2s;
+  border-radius: 3px;
 }
+
+button:hover {
+  box-shadow: 0px 2px 4px 1px rgba(0,0,0,0.2);
+}
+
+#game-over.hidden { display: none; }
+
+#game-over {
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
+  font-size: 30px;
+  background: rgba(255,255,255, 0.85);
+  flex-direction: column;
+  justify-content: space-between;
+  display: flex;
+  padding: 100px;
+}
+
+#game-over .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 40px;
+}
+
+#game-over .row span {
+  font-size: 40px;
+}
+
+#game-over .scoreboard {
+  position: relative;
+  height: 100px;
+}
+
+#game-over .scoreboard .team {
+  z-index: 1;
+}
+
+#game-over .scoreboard .team.mine {
+  right: 75px;
+}
+
+#game-over .scoreboard .team.other {
+  right: 0px;
+  top: 25px;
+}
+
+.dimmed {
+  background: lightgray;
+  border-radius: 5px;
+  padding: 40px;
+}
+
+

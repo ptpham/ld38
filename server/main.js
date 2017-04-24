@@ -4,7 +4,8 @@ import { Tiles, TILE_COSTS, HOME, ROAD,
 import { Lights } from '../common/lights';
 import { Cars } from '../common/cars';
 import { Teams } from '../common/teams';
-import { Games, newGame, registerTeam, getGameId, reloadGame } from './games';
+import { Games } from '../common/games';
+import { newGame, checkGameEnd, registerTeam, getGameId, reloadGame } from './games';
 
 import { buildRoad, buildHome, expandWork } from './building';
 import { harvestTile } from './resources';
@@ -51,5 +52,6 @@ Meteor.startup(() => {
     simulate();
     expandWork();
     cycleLights();
+    checkGameEnd();
   }, 1000);
 });

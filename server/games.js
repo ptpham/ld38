@@ -4,9 +4,9 @@ import _ from 'lodash';
 
 import { resetPathingState } from './pathing';
 import { generateMap } from './building';
+import { Games } from '../common/games';
 
-export const Games = new Mongo.Collection('games');
-export const GAME_TIME = 30*60*1000;
+export const GAME_TIME = 5*60*1000;
 
 let gameId = null;
 var users = 0;
@@ -22,16 +22,25 @@ export function newGame() {
   return gameId;
 }
 
+export function checkGameEnd() {
+  var game = Games.findOne({ _id: gameId });
+  if (_.now() > game.end) {
+    Games.update({ _id: gameId }, { $set: { active: false } });
+    newGame();
+  }
+}
+
 export function reloadGame() {
   if (gameId != null) return gameId;
-
   var currentGame = Games.findOne({ active: true });
   if (currentGame == null) return newGame();
+  gameId = currentGame._id;
   return currentGame._id;
 }
 
 export function registerTeam() {
   users++;
+  Games.update({ _id: gameId }, { $inc: { users: 1 } });
   return users % 2;
 }
 
