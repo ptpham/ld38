@@ -23,6 +23,7 @@ var _v3_1 = vec3.create();
 var _v4_0 = vec4.create();
 const RADIUS = 1;
 const RADIUS_COS30 = RADIUS*Math.cos(Math.PI/6);
+var DEGREES_60 = Math.PI/3;
 var ROAD_SCALE = 0.3;
 var CAR_SCALE = 0.12;
 var ROAD_SCALING = _.times(3, () => ROAD_SCALE);
@@ -32,10 +33,10 @@ var OFFICE_MESH = new Mesh(officeGeometry);
 var TREE_MESH = new Mesh(treeGeometry);
 var ROCK_MESH = new Mesh(rockGeometry);
 var HOUSE_SCALINGS = [[0.15, 0.2, 0.2],[0.2,0.15,0.2],[0.2,0.2,0.15]];
-var OFFICE_SCALINGS = [[0.3, 0.4, 0.5],[0.3,0.3,0.4],[0.4,0.6,0.3]];
+var OFFICE_SCALINGS = [[0.3, 0.4, 0.5],[0.3,0.3,0.4],[0.3,0.3,0.3]];
 var TREE_SCALINGS = [[0.2, 0.2, 0.2],[0.2,0.2,0.3],[0.15,0.15,0.4]];
 var ROCK_SCALINGS = [[0.1, 0.1, 0.1],[0.2,0.1,0.2],[0.1,0.2,0.2]];
-var DEGREES_60 = Math.PI/3;
+var ROTATIONS = [0, DEGREES_60, DEGREES_60 * 2, DEGREES_60 * 5, DEGREES_60 * 7];
 
 function resizeCanvas(gl, canvas) {
   canvas.width = document.body.offsetWidth;
@@ -232,7 +233,9 @@ export class Renderer {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
       shader.uniforms.color = TEAM_COLORS[tile.teamId];
-      shader.uniforms.world = mat4.scale(world, world, HOUSE_SCALINGS[i % 3]);
+      mat4.scale(world, world, HOUSE_SCALINGS[i % 3]);
+      mat4.rotateZ(world, world, ROTATIONS[i % ROTATIONS.length]);
+      shader.uniforms.world = world;
       house.draw(gl.TRIANGLES);
     });
 
@@ -241,7 +244,9 @@ export class Renderer {
     Tiles.find({ type: WORK }).forEach((tile, i) => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
-      shader.uniforms.world = mat4.scale(world, world, OFFICE_SCALINGS[i % 3]);
+      mat4.scale(world, world, OFFICE_SCALINGS[i % 3]);
+      mat4.rotateZ(world, world, ROTATIONS[i % ROTATIONS.length]);
+      shader.uniforms.world = world;
       office.draw(gl.TRIANGLES);
     });
 
@@ -250,7 +255,9 @@ export class Renderer {
     Tiles.find({ type: TREE }).forEach((tile, i) => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
-      shader.uniforms.world = mat4.scale(world, world, TREE_SCALINGS[i % 3]);
+      mat4.scale(world, world, TREE_SCALINGS[i % 3]);
+      mat4.rotateZ(world, world, ROTATIONS[i % ROTATIONS.length]);
+      shader.uniforms.world = world;
       tree.draw(gl.TRIANGLES);
     });
 
@@ -259,7 +266,9 @@ export class Renderer {
     Tiles.find({ type: ROCK }).forEach((tile, i) => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
-      shader.uniforms.world = mat4.scale(world, world, ROCK_SCALINGS[i % 3]);
+      mat4.scale(world, world, ROCK_SCALINGS[i % 3]);
+      mat4.rotateZ(world, world, ROTATIONS[i % ROTATIONS.length]);
+      shader.uniforms.world = world;
       rock.draw(gl.TRIANGLES);
     });
   }

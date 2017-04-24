@@ -4,7 +4,6 @@ import { TEAM_COLORS } from '../common/teams';
 Template.score.helpers({
   teamClass(index) {
     const myTeam = localStorage.getItem('team');
-    console.log(myTeam);
     return index == myTeam ? 'mine': 'other';
   },
   background(index) {
