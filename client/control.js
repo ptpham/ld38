@@ -110,14 +110,13 @@ export class Control {
 
     if (e.shiftKey) {
       this.camera.theta += deltaX / 100;
-      this.camera.phi += deltaY / 100;
     } else {
       var forward = this.camera.forward(_v3_0);
       forward[2] = 0;
 
       var side = vec3.transformMat4(_v3_1, forward, rot90);
-      vec3.scale(forward, forward, deltaY/(vec3.length(forward)*100));
-      vec3.scale(side, side, deltaX/(vec3.length(side)*100));
+      vec3.scale(forward, forward, -deltaY/(vec3.length(forward)*100));
+      vec3.scale(side, side, -deltaX/(vec3.length(side)*100));
       vec3.add(_v3_0, _v3_0, _v3_1);
       this.camera.translate(_v3_0);
     }
