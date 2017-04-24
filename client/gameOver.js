@@ -38,3 +38,20 @@ Template.gameOver.events({
   }
 });
 
+Template.timeRemain.helpers({
+  parsed() {
+    var game = Games.findOne(gameMeta.get('gameId'));
+    if (game == null) return {};
+
+    var now = gameMeta.get('now');
+    var delta = Math.max(game.end - _.now(), 0);
+    var hours = Math.floor(delta / (60*60*1000));
+    delta -= hours*60*60*1000;
+
+    var minutes = Math.floor(delta/(60*1000));
+    delta -= minutes*60*1000;
+    var seconds = Math.floor(delta/1000);
+    return { hours, minutes, seconds };
+  },
+})
+

@@ -11,9 +11,14 @@
   <audio src="ld38.mp3" autoplay loop></audio>
   {{> harvest }}
   {{> build}}
+  {{> timeRemain}}
   {{> intro}}
   {{> gameOver}}
 </body>
+
+<template name="timeRemain">
+  <div id="time-remain">Game ends in {{parsed.hours}}:{{parsed.minutes}}:{{parsed.seconds}}</div>
+</template>
 
 <template name="score">
   <div
@@ -85,10 +90,11 @@
       <p>
         Road intersections will have stop lights.
         Click on a path in the intersection to change the light.
+        Traffic lights have a cool down so you can't change them too fast!
         They will switch randomly so keep an eye on them for optimal traffic management!
         <br /><br />
         As you collect taxes, you'll be able to contruct new homes or roads on the map.
-        Click on a tile near a road to begin the process. It costs
+        Click on a land tile near a road to begin the process. It costs
         <b>{{ roadCost }} to build a road</b> and
         <b>{{ homeCost }} to build a home</b>.
         <br/><br/>

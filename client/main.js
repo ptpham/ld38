@@ -13,7 +13,7 @@ import { gameMeta } from './gameOver';
 import { Games } from '../common/games';
 
 Template.body.helpers({
-  teams() { return Teams.find(); }
+  teams() { return Teams.find(); },
 });
 
 Meteor.startup(() => {
@@ -59,4 +59,8 @@ Meteor.startup(() => {
     Meteor.subscribe('teams', gameId);
     Meteor.subscribe('games', gameId);
   });
+
+  Meteor.setInterval(() => {
+    gameMeta.set('now', Date.now());
+  }, 1000);
 });
