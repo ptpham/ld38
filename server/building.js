@@ -79,7 +79,7 @@ export function buildHome(x, y, teamId, check) {
   const tile = Tiles.findOne({ x, y, gameId });
   if (!check || canBuildHome(tile)) {
     build({ x, y, type: HOME });
-    Tiles.upsert({ x, y, gameId }, { $set: { teamId } });
+    Tiles.upsert({ x, y, gameId }, { $set: { teamId } }, () => expandRoads());
     Teams.update({ gameId, index: teamId.toString() }, { $inc: { homes: 1 } });
   }
 }
@@ -127,5 +127,16 @@ export function expandWork() {
   });
 
   if (found != null) buildWork(found.x, found.y);
+}
+
+function expandRoads() {
+  var gameId = getGameId();
+  var candidates = Tiles.find({ gameId,
+    type: { $in: _.keys(BUILDABLE_SET) }, roads: { $gt: 0 } }).fetch();
+  var filtered = _.filter(candidates, tile => canBuildRoad(tile));
+  if (filtered.length > 3 || filtered.length == 0) return;
+  var target = _.sample(filtered);
+  buildRoad(target.x, target.y);
+  expandRoads();
 }
 

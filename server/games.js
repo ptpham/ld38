@@ -24,7 +24,7 @@ export function newGame() {
 
 export function checkGameEnd() {
   var game = Games.findOne({ _id: gameId });
-  if (_.now() > game.end) {
+  if (game.active == false || _.now() > game.end) {
     Games.update({ _id: gameId }, { $set: { active: false } });
     newGame();
   }
