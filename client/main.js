@@ -12,25 +12,33 @@ Template.body.helpers({
 });
 
 Meteor.startup(() => {
-  let team = localStorage.getItem('team');
-  if (team == null) {
-    Meteor.call('registerTeam', (team) => {
-      localStorage.setItem('team', team);
-    });
-  }
+  Meteor.call('getGameId', gameId => {
+    if (gameId != localStorage.getItem('gameId')) {
+      localStorage.clear();
+    }
 
-  Meteor.subscribe('tiles');
-  Meteor.subscribe('lights');
-  Meteor.subscribe('cars');
-  Meteor.subscribe('teams');
-  var canvas = document.getElementById('canvas');
-  var renderer = new Renderer(canvas);
-  var control = new Control(renderer);
+    localStorage.setItem('gameId', gameId);
+    let team = localStorage.getItem('team');
 
-  function raf() {
-    renderer.draw();
+    if (team == null) {
+      Meteor.call('registerTeam', (err, teamId) => {
+        localStorage.setItem('team', teamId);
+      });
+    }
+
+    Meteor.subscribe('tiles');
+    Meteor.subscribe('lights');
+    Meteor.subscribe('cars');
+    Meteor.subscribe('teams');
+    var canvas = document.getElementById('canvas');
+    var renderer = new Renderer(canvas);
+    var control = new Control(renderer);
+
+    function raf() {
+      renderer.draw();
+      requestAnimationFrame(raf);
+    }
     requestAnimationFrame(raf);
-  }
-  requestAnimationFrame(raf);
-  control.addListeners();
+    control.addListeners();
+  });
 });

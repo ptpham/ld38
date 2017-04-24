@@ -10,6 +10,7 @@ import { harvestTile } from './resources';
 import { toggleLight, switchLight } from './lighting';
 import { findDistances } from './pathing';
 import { simulate } from './automata';
+import { getGameId } from '../common/games';
 
 Meteor.startup(() => {
   // code to run on server at startup
@@ -30,6 +31,7 @@ Meteor.startup(() => {
     buildRoad: (x, y) => buildRoad(x, y, true),
     harvestTile,
     switchLight,
+    getGameId,
     toggleLight: (x, y) => toggleLight(x, y, true),
     registerTeam: () => { users++; return users % 2; }
   });
