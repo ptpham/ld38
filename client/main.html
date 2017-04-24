@@ -17,7 +17,7 @@
 </body>
 
 <template name="timeRemain">
-  <div id="time-remain">Game ends in {{parsed.hours}}:{{parsed.minutes}}:{{parsed.seconds}}</div>
+  <div id="time-remain">Game ends in {{parsed.hours}}h {{parsed.minutes}}m {{parsed.seconds}}s</div>
 </template>
 
 <template name="score">
@@ -94,7 +94,8 @@
         They will switch randomly so keep an eye on them for optimal traffic management!
         <br /><br />
         As you collect taxes, you'll be able to contruct new homes or roads on the map.
-        Click on a land tile near a road to begin the process. It costs
+        Click on a land tile near a road to begin the process. Land tiles that
+        can be built on will be highlighter a lighter green color. It costs
         <b>{{ roadCost }} to build a road</b> and
         <b>{{ homeCost }} to build a home</b>.
         <br/><br/>

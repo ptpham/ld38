@@ -57,7 +57,12 @@ Meteor.startup(() => {
     Meteor.subscribe('lights', gameId);
     Meteor.subscribe('cars', gameId);
     Meteor.subscribe('teams', gameId);
-    Meteor.subscribe('games', gameId);
+    Meteor.subscribe('games', gameId, () => {
+      if (Games.findOne(localStorage.getItem('gameId')) == null) {
+        localStorage.clear();
+        document.location.reload(true);
+      }
+    });
   });
 
   Meteor.setInterval(() => {
