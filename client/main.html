@@ -9,6 +9,7 @@
   <audio src="ld38.mp3" autoplay loop></audio>
   {{> harvest }}
   {{> build}}
+  {{> intro}}
 </body>
 
 <template name="score">
@@ -37,4 +38,58 @@
       {{/each}}
     </div>
   </div>
+</template>
+
+<template name="intro">
+  <div id="intro-overlay" class="{{isHidden}}">
+    <div>
+      <p>
+      Welcome new ground traffic controller!
+      <br /><br />
+      Your goal is to help your fellow sheep-- I mean citizens get to and from
+      their home and workplace.
+      </p>
+
+      <div class="home">
+        <svg style="fill:{{ teamColor }}" viewbox="0 0 300 300">{{> hexagon}}</svg>
+        <p>
+          These tiles are their homes.
+        </p>
+      </div>
+
+      <div class="work">
+        <svg style="fill: rgb(255, 206, 58)" viewbox="0 0 300 300">{{> hexagon}}</svg>
+        <p>
+          These tiles are their workplaces.
+          <br /><br />
+          Taxes are accumulated at these locations. Click them to collect the taxes.
+          <br /><br />
+          Once in a while citizens will become weary of their current work and find a new one.
+        </p>
+      </div>
+
+      <div class="rival">
+        <svg style="fill:{{ rivalColor }}" viewbox="0 0 300 300">{{> hexagon}}</svg>
+        <p>
+          These are the homes of our rivals.
+          <br /><br />
+          Try to make their commutes extra terrible.
+        </p>
+      </div>
+
+      <p>
+        Road intersections will have stop lights.
+        Click on a path in the intersection to change the light to block it.
+        <br /><br />
+        As you collect taxes, you'll be able to contruct new homes or roads on the map.
+        Click on a tile you'd like to construct on to begin the process.
+      </p>
+
+      <button>Got it!</button>
+    </div>
+  </div>
+</template>
+
+<template name="hexagon">
+  <polygon class="hex" points="300,150 225,280 75,280 0,150 75,20 225,20"></polygon>
 </template>

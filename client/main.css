@@ -76,3 +76,46 @@ canvas { width: 100vw; height: 100vh; }
   margin: 5px;
   border-radius: 4px;
 }
+
+#intro-overlay {
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
+  display: flex;
+  font-size: 0.9em;
+}
+
+#intro-overlay.hidden {
+  display: none;
+}
+
+#intro-overlay svg {
+  height: 30px;
+  width: 30px;
+  stroke: 1;
+  margin-right: 20px;
+}
+
+#intro-overlay button {
+  display: block;
+  width: 100px;
+  margin: auto;
+}
+
+#intro-overlay > div {
+  width: 80%;
+  height: 80%;
+  margin: auto;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid white;
+  padding: 10px;
+}
+
+#intro-overlay .home,
+#intro-overlay .work,
+#intro-overlay .rival {
+  display: flex;
+  align-items: center;
+  background: white;
+  margin-bottom: 10px;
+  padding: 10px;
+}

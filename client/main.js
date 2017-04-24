@@ -1,6 +1,7 @@
 
 import './main.html';
 import './scoreboard';
+import { introParams } from './intro';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { Renderer } from './renderer';
@@ -25,7 +26,12 @@ Meteor.startup(() => {
     if (team == null) {
       Meteor.call('registerTeam', (err, teamId) => {
         localStorage.setItem('team', teamId);
+        introParams.set('team', teamId);
+        introParams.set('hide', false);
       });
+    } else {
+      introParams.set('team', team);
+      introParams.set('hide', false);
     }
 
     var canvas = document.getElementById('canvas');

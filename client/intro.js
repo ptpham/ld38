@@ -1,0 +1,34 @@
+import { Template } from 'meteor/templating';
+import { ReactiveDict } from 'meteor/reactive-dict';
+import { TEAM_COLORS } from '../common/teams';
+
+export const introParams = new ReactiveDict();
+introParams.set('hide', true);
+
+Template.intro.helpers({
+  isHidden() {
+    const hide = introParams.get('hide');
+    return hide ? 'hidden': 'visible';
+  },
+  teamColor() {
+    const team = introParams.get('team');
+    if (team == null) return;
+    const color = TEAM_COLORS[team];
+    const str = color.slice(0, 3).map(c => Math.round(c*255)).join(',');
+    return `rgb(${str})`;
+  },
+  rivalColor() {
+    const team = introParams.get('team');
+    if (team == null) return;
+    const color = TEAM_COLORS[(Number(team) + 1) % 2];
+    const str = color.slice(0, 3).map(c => Math.round(c*255)).join(',');
+    return `rgb(${str})`;
+  }
+});
+
+Template.intro.events({
+  'click button': function(event) {
+    event.stopImmediatePropagation();
+    introParams.set('hide', true);
+  }
+});
