@@ -18,3 +18,51 @@ canvas { width: 100vw; height: 100vh; }
   display: none;
 }
 
+.team {
+  pointer-events: none;
+  color: white;
+  padding: 1em;
+}
+.team.mine {
+  position: absolute;
+  top: 0;
+}
+.team.mine::before {
+  content: 'Team:';
+}
+.team.other {
+  font-size: 0.75em;
+  position: absolute;
+  top: 50px;
+}
+.team.other::before {
+  content: 'Opponent:';
+}
+
+#build-overlay {
+  transition: opacity 0.2s;
+  position: absolute;
+  display: flex;
+  top: 0; bottom: 0; left: 0; right: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#build-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#build-overlay > div {
+  background: white;
+  border: 1px solid #ccc;
+  width: 50%;
+  text-align: center;
+  margin: auto;
+  padding: 20px;
+}
+
+#build-overlay button {
+  width: 100px;
+  height: 40px;
+}

@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import { Tiles, TREE, ROCK, AQUA, NONE, WORK, HOME, ROAD } from '../common/tiles';
+import { Tiles, canBuildHome, canBuildRoad,
+  TREE, ROCK, AQUA, NONE, WORK, HOME, ROAD } from '../common/tiles';
 import { getGameId } from '../common/games';
 import HexGrid from '../common/hexgrid';
 import { createLight } from './lighting';
@@ -35,14 +36,14 @@ export function build({ x, y, type }, stop) {
 export function buildRoad(x, y, check) {
   const gameId = getGameId();
   const tile = Tiles.findOne({ x, y, gameId });
-  if (tile.roads || !check) {
+  if (canBuildRoad(tile) || !check) {
     build({ x, y, type: ROAD });
   }
 }
 export function buildHome(x, y, teamId, check) {
   const gameId = getGameId();
   const tile = Tiles.findOne({ x, y, gameId });
-  if (tile.roads == 1 || !check) {
+  if (canBuildHome(tile) || !check) {
     build({ x, y, type: HOME });
     Tiles.upsert({ x, y, gameId }, { $set: { teamId } });
   }

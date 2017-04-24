@@ -1,6 +1,4 @@
-import _ from 'lodash';
 import { Mongo } from 'meteor/mongo';
-import HexGrid from './hexgrid';
 
 export const Tiles = new Mongo.Collection('tiles');
 
@@ -14,3 +12,10 @@ export const NONE = 'NONE';
 
 export const MAX_RESOURCES = 10;
 
+export function canBuildHome(tile) {
+  return tile.roads == 1;
+}
+
+export function canBuildRoad(tile) {
+  return tile.roads > 0 && tile.roads < 3;
+}

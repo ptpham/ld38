@@ -1,9 +1,5 @@
 import { Template } from 'meteor/templating';
-import { Teams, TEAM_COLORS } from '../common/teams';
-
-Template.body.helpers({
-  teams() { return Teams.find(); }
-});
+import { TEAM_COLORS } from '../common/teams';
 
 Template.score.helpers({
   teamClass(index) {

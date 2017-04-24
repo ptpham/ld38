@@ -2,9 +2,14 @@
 import './main.html';
 import './scoreboard';
 import { Meteor } from 'meteor/meteor';
+import { Template } from 'meteor/templating';
 import { Renderer } from './renderer';
 import { Control } from './control';
-import _ from 'lodash';
+import { Teams } from '../common/teams';
+
+Template.body.helpers({
+  teams() { return Teams.find(); }
+});
 
 Meteor.startup(() => {
   let team = localStorage.getItem('team');
