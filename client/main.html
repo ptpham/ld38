@@ -95,9 +95,11 @@
         <br /><br />
         As you collect taxes, you'll be able to contruct new homes or roads on the map.
         Click on a land tile near a road to begin the process. Land tiles that
-        can be built on will be highlighter a lighter green color. It costs
+        can be built on will be highlighter a lighter green color and your team
+        has enough resources to build there. An intersection may not involve more
+        than three roads. It costs
         <b>{{ roadCost }} to build a road</b> and
-        <b>{{ homeCost }} to build a home</b>.
+        <b>{{ homeCost }} times the number of homes your team currently owns to build a new home</b>.
         <br/><br/>
         Drag your mouse to move and hold shift to rotate the camera.
       </p>
@@ -116,7 +118,7 @@
     <div style="text-align:center">The game that you were previously playing is now over!</div>
     <div class="row"><span>Start Time</span><span>{{timeBegin}}</span></div>
     <div class="row"><span>End Time</span><span>{{timeEnd}}</span></div>
-    <div class="row"><span>Total number of players</span><span>{{users-1}}</span></div>
+    <div class="row"><span>Total number of players</span><span>{{users}}</span></div>
     <div class="row dimmed">
       <span>Final Score</span>
       <div class="scoreboard">

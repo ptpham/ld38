@@ -42,10 +42,11 @@ Meteor.startup(() => {
     var control = new Control(renderer);
 
     Meteor.subscribe('tiles', gameId, () => {
-      var sum = 0;
-      Tiles.find().forEach(tile => sum += tile.x);
-      var center = sum/Tiles.find().count();
-      renderer.camera.translate(vec3.fromValues(center, center, 0));
+      var xs = Tiles.find().map(tile => renderer.hexgrid.center(vec3.create(), tile.x, tile.y)[0]);
+      var ys = Tiles.find().map(tile => renderer.hexgrid.center(vec3.create(), tile.x, tile.y)[1]);
+      var centerX = (_.max(xs) + _.min(xs))/2;
+      var centerY = (_.max(ys) + _.min(ys))/2;
+      renderer.camera.translate(vec3.fromValues(centerX, centerY, 0));
 
       function raf() {
         renderer.draw();

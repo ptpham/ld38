@@ -16,7 +16,7 @@ export function newGame() {
   gameId = Games.insert({ begin, end, active: true, users: 0 });
   Teams.insert({ gameId, resources: 5, index: '0' });
   Teams.insert({ gameId, resources: 5, index: '1' });
-  generateMap(10, 10);
+  generateMap(15, 15);
   resetPathingState();
   users = 0;
   return gameId;
@@ -33,7 +33,7 @@ export function checkGameEnd() {
 export function reloadGame() {
   if (gameId != null) return gameId;
   var currentGame = Games.findOne({ active: true });
-  if (currentGame == null) return newGame();
+  if (currentGame == null || currentGame.active == false) return newGame();
   gameId = currentGame._id;
   return currentGame._id;
 }

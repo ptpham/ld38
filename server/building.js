@@ -5,6 +5,7 @@ import { getGameId } from './games';
 import HexGrid from '../common/hexgrid';
 import { createLight } from './lighting';
 import { cantorZ } from '../common/pairing';
+import { Teams } from '../common/teams';
 
 function pushPath(src, dst) {
   var bothRoad = src.type == ROAD && dst.type == ROAD;
@@ -79,6 +80,7 @@ export function buildHome(x, y, teamId, check) {
   if (!check || canBuildHome(tile)) {
     build({ x, y, type: HOME });
     Tiles.upsert({ x, y, gameId }, { $set: { teamId } });
+    Teams.update({ gameId, index: teamId.toString() }, { $inc: { homes: 1 } });
   }
 }
 export function buildWork(x, y) { return build({ x, y, type: WORK }); }
@@ -87,7 +89,7 @@ export function generateMap(width, height) {
   const possibleTypes = [TREE, ROCK, AQUA, NONE];
   for (let i = 0; i < height; i++) {
     for (let j = 0; j < width; j++) {
-      if (i + j === 0 || i + j === height + width - 2) continue;
+      if (i + j < width/2 || i + j >= 1.5*width) continue;
       build({ x: j, y: i, type: _.sample(possibleTypes) });
     }
   }
@@ -100,7 +102,6 @@ export function generateMap(width, height) {
   buildRoad(center[0] - 1, center[1] + 1);
   buildWork(center[0] + 1, center[1] + 1);
   buildHome(center[0] - 1, center[1] - 1, 0);
-  buildHome(center[0] + 1, center[1] - 1, 0);
   buildHome(center[0] - 1, center[1] + 2, 1);
   return Tiles;
 }

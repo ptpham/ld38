@@ -21,8 +21,12 @@ export function canBuildHome(tile) {
   return tile.roads > 0 && tile.type in BUILDABLE_SET;
 }
 
-export function canBuyHome(resources) {
-  const cost = TILE_COSTS[HOME];
+export function homeCost(homes, resources) {
+  return homes * TILE_COSTS[HOME];
+}
+
+export function canBuyHome(homes, resources) {
+  const cost = homeCost(homes, resources);
   return resources >= cost;
 }
 

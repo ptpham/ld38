@@ -26,8 +26,8 @@ Meteor.startup(() => {
   Meteor.methods({
     buildHome: (x, y, index) => {
       var gameId = getGameId();
-      const resources = Teams.findOne({ gameId, index }).resources;
-      if (!canBuyHome(resources)) return;
+      const { resources, homes } = Teams.findOne({ gameId, index });
+      if (!canBuyHome(homes, resources)) return;
       Teams.update({ gameId, index }, { $set: { resources: resources - TILE_COSTS[HOME] } });
       buildHome(x, y, index, true);
     },
