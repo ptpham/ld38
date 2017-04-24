@@ -62,12 +62,11 @@ export function generateMap(width, height) {
   // generate roads
   const center = [Math.ceil(width / 2) - 1, Math.ceil(height / 2) - 1];
   buildRoad(center[0], center[1]);
-  if (width > 5 && height > 5) {
-    buildRoad(center[0] + 1, center[1]);
-    buildRoad(center[0], center[1] - 1);
-    buildRoad(center[0] - 1, center[1] + 1);
-    buildWork(center[0] + 1, center[1] + 1);
-    buildHome(center[0] - 1, center[1] - 1, 0);
-  }
+  buildRoad(center[0] + 1, center[1]);
+  buildRoad(center[0], center[1] - 1);
+  buildRoad(center[0] - 1, center[1] + 1);
+  buildWork(center[0] + 1, center[1] + 1);
+  buildHome(center[0] - 1, center[1] - 1, 0);
+  buildHome(center[0] - 1, center[1] + 2, 1);
   return Tiles;
 }
