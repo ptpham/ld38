@@ -6,7 +6,7 @@ import { Lights } from '../common/lights';
 import { Cars } from '../common/cars';
 import { Teams } from '../common/teams';
 
-import { generateMap, buildRoad, buildHome } from './building';
+import { generateMap, buildRoad, buildHome, expandWork } from './building';
 import { harvestTile } from './resources';
 import { cycleLights, switchLight } from './lighting';
 import { findDistances } from './pathing';
@@ -48,5 +48,9 @@ Meteor.startup(() => {
 
   findDistances();
   Meteor.setInterval(() => { findDistances(); }, 5000);
-  Meteor.setInterval(() => { simulate(); cycleLights(); }, 1000);
+  Meteor.setInterval(() => {
+    simulate();
+    expandWork();
+    cycleLights();
+  }, 1000);
 });

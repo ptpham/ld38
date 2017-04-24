@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Tiles, canBuildHome, canBuildRoad,
+import { Tiles, canBuildHome, canBuildRoad, BUILDABLE_SET,
   TREE, ROCK, AQUA, NONE, WORK, HOME, ROAD } from '../common/tiles';
 import { getGameId } from '../common/games';
 import HexGrid from '../common/hexgrid';
@@ -105,3 +105,28 @@ export function generateMap(width, height) {
   buildHome(center[0] - 1, center[1] + 2, 1);
   return Tiles;
 }
+
+export function expandWork() {
+  var gameId = getGameId();
+  var population = Tiles.find({ gameId, type: HOME }).count();
+  var workCount = Tiles.find({ gameId, type: WORK }).count();
+
+  if (workCount > population / 2) return;
+  var roads = Tiles.find({ gameId, type: ROAD }).fetch();
+  var found = null;
+  
+  roads.forEach(road => {
+    if (road.paths.length == 6) return;
+    
+    HexGrid.shifts.forEach(shift => {
+      var other = Tiles.findOne({ gameId,
+        index: cantorZ(road.x + shift[0], road.y + shift[1]) });
+      if (other == null) return;
+      if (other.type in BUILDABLE_SET) found = found || other;
+    })
+  });
+
+  if (found != null) buildWork(found.x, found.y);
+}
+
+
