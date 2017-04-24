@@ -8,6 +8,7 @@ import { Tiles, canBuildHome, canBuildRoad,
 import { Cars } from '../common/cars';
 import { TEAM_COLORS } from '../common/teams';
 import { Lights } from '../common/lights';
+import { buildParams } from './build';
 import Lanes from './lanes';
 import HexGrid from '../common/hexgrid';
 import { Mesh } from 'webgl-obj-loader';
@@ -128,6 +129,9 @@ export class Renderer {
     shader.uniforms.view = view;
     shader.uniforms.projection = projection;
 
+    var buildTile = buildParams.get('tile');
+    var showBuildTile = buildParams.get('show');
+
     Tiles.find().forEach(tile => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       _v3_0[2] = 0;
@@ -153,6 +157,10 @@ export class Renderer {
         color[0] += 0.05;
         color[1] += 0.05;
         color[2] += 0.05;
+      }
+
+      if (showBuildTile && buildTile._id === tile._id) {
+        color = [1,1,1,1];
       }
 
       shader.uniforms.world = mat4.fromTranslation(this.world, _v3_0);
