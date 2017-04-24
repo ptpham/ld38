@@ -12,12 +12,20 @@ canvas { width: 100vw; height: 100vh; }
   transition: opacity 0.2s;
   display: flex;
   position: absolute;
-  padding: 20px;
   opacity: 1;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid white;
+  border-radius: 4px;
+  padding: 10px;
 }
 
 #harvest-overlay.hidden {
   display: none;
+}
+
+#money-earned {
+  font-weight: bold;
+  margin-left: 5px;
 }
 
 .team svg {
