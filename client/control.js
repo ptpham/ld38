@@ -98,9 +98,9 @@ export class Control {
       if (tile.type == WORK) {
         harvestParams.set('clientX', e.clientX);
         harvestParams.set('clientY', e.clientY);
-        harvestParams.set('money', _.get(tile, 'resources.' + team) || 0);
+        harvestParams.set('tileId', tile._id);
       } else {
-        harvestParams.set('money', -1);
+        harvestParams.set('tileId', null);
       }
     }
 
