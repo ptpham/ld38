@@ -4,7 +4,7 @@ import { TEAM_COLORS } from '../common/teams';
 import { HOME, ROAD, TILE_COSTS } from '../common/tiles';
 
 export const introParams = new ReactiveDict();
-introParams.set('hide', true);
+introParams.set('hide', !!localStorage.getItem('intro'));
 
 Template.intro.helpers({
   isHidden() {
@@ -37,6 +37,7 @@ Template.intro.events({
   'click button': function(event) {
     event.stopImmediatePropagation();
     introParams.set('hide', true);
+    localStorage.setItem('intro', 'done');
   },
   'click #info': function(event) {
     event.stopImmediatePropagation();

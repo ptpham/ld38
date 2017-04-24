@@ -27,11 +27,9 @@ Meteor.startup(() => {
       Meteor.call('registerTeam', (err, teamId) => {
         localStorage.setItem('team', teamId);
         introParams.set('team', teamId);
-        introParams.set('hide', false);
       });
     } else {
       introParams.set('team', team);
-      introParams.set('hide', false);
     }
 
     var canvas = document.getElementById('canvas');
