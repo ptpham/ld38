@@ -11,6 +11,10 @@ Template.intro.helpers({
     const hide = introParams.get('hide');
     return hide ? 'hidden': 'visible';
   },
+  isHiddenInv() {
+    const hide = introParams.get('hide');
+    return hide ? 'visible': 'hidden';
+  },
   teamColor() {
     const team = introParams.get('team');
     if (team == null) return;
@@ -33,5 +37,9 @@ Template.intro.events({
   'click button': function(event) {
     event.stopImmediatePropagation();
     introParams.set('hide', true);
+  },
+  'click #info': function(event) {
+    event.stopImmediatePropagation();
+    introParams.set('hide', false);
   }
 });
