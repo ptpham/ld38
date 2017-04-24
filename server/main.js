@@ -8,7 +8,7 @@ import { Teams } from '../common/teams';
 
 import { generateMap, buildRoad, buildHome } from './building';
 import { harvestTile } from './resources';
-import { toggleLight, switchLight } from './lighting';
+import { cycleLights, switchLight } from './lighting';
 import { findDistances } from './pathing';
 import { simulate } from './automata';
 import { getGameId } from '../common/games';
@@ -43,11 +43,10 @@ Meteor.startup(() => {
     harvestTile,
     switchLight,
     getGameId,
-    toggleLight: (x, y) => toggleLight(x, y, true),
     registerTeam: () => { users++; return users % 2; }
   });
 
   findDistances();
   Meteor.setInterval(() => { findDistances(); }, 5000);
-  Meteor.setInterval(() => { simulate(); }, 1000);
+  Meteor.setInterval(() => { simulate(); cycleLights(); }, 1000);
 });

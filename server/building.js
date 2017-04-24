@@ -19,8 +19,9 @@ function pushPath(src, dst, roadsOnly) {
 function checkStopLight(tileId) {
   var tile = Tiles.findOne({ _id: tileId });
   if (tile.type != ROAD) return;
+  const check = tile.paths ? tile.paths.length == 3 && tile.roads == 3 : tile.roads == 3;
 
-  if (tile.paths.length == 3) {
+  if (check) {
     var adjacentRoads = Tiles.find({ _id: { $in: tile.paths }, type: ROAD }).fetch();
     var closedTile = Tiles.findOne({ _id: _.sample(adjacentRoads)._id });
 

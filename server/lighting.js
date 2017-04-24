@@ -1,4 +1,4 @@
-import { Lights, LIGHT_CD } from '../common/lights';
+import { Lights, LIGHT_CD, LIGHT_WAIT } from '../common/lights';
 import { getGameId } from '../common/games';
 import { Tiles } from '../common/tiles';
 import HexGrid from '../common/hexgrid';
@@ -45,3 +45,11 @@ export function toggleLight(x, y) {
   return switchLight(x, y, closed);
 }
 
+export function cycleLights() {
+  const gameId = getGameId();
+  const currentTime = Date.now();
+  Lights.find({ gameId, cd: null })
+    .forEach(light => toggleLight(light.x, light.y));
+  Lights.find({ gameId, cd: { $lt: currentTime - LIGHT_WAIT } })
+    .forEach((light) => toggleLight(light.x, light.y));
+}
