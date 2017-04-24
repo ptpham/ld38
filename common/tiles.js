@@ -11,11 +11,12 @@ export const AQUA = 'AQUA';
 export const NONE = 'NONE';
 
 export const MAX_RESOURCES = 10;
+export const BUILDABLE_SET = {TREE, ROCK, AQUA, NONE};
 
 export function canBuildHome(tile) {
-  return tile.roads == 1;
+  return tile.roads == 1 && tile.type in BUILDABLE_SET;
 }
 
 export function canBuildRoad(tile) {
-  return tile.roads > 0 && tile.roads < 3;
+  return tile.roads > 0 && tile.roads < 3 && tile.type in BUILDABLE_SET;
 }

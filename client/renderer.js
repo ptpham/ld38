@@ -3,7 +3,8 @@ import { flatShader } from './shaders';
 import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
 import { vec3, vec4, mat4 } from 'gl-matrix';
-import { Tiles, ROAD, WORK, HOME, TREE, AQUA, ROCK } from '../common/tiles';
+import { Tiles, canBuildHome, canBuildRoad,
+  ROAD, WORK, HOME, TREE, AQUA, ROCK } from '../common/tiles';
 import { Cars } from '../common/cars';
 import { TEAM_COLORS } from '../common/teams';
 import { Lights } from '../common/lights';
@@ -132,6 +133,7 @@ export class Renderer {
       _v3_0[2] = 0;
 
       var color = [0.92,0.9,0.9,1];
+
       if (tile.type == WORK) {
         color = [0, 1, 0, 1];
       } else if (tile.type == HOME) {
@@ -145,6 +147,12 @@ export class Renderer {
       if (this.highlight != null
         && this.highlight[0] == tile.x && this.highlight[1] == tile.y) {
         color[0] = 1;
+      }
+
+      if (canBuildHome(tile) || canBuildRoad(tile)) {
+        color[0] += 0.05;
+        color[1] += 0.05;
+        color[2] += 0.05;
       }
 
       shader.uniforms.world = mat4.fromTranslation(this.world, _v3_0);
