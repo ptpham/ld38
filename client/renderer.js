@@ -4,7 +4,7 @@ import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
 import { vec3, vec4, mat4 } from 'gl-matrix';
 import { Tiles, canBuildHome, canBuildRoad,
-  ROAD, WORK, HOME, TREE, AQUA, ROCK } from '../common/tiles';
+  ROAD, WORK, HOME, TREE, NONE, AQUA, ROCK } from '../common/tiles';
 import { Cars } from '../common/cars';
 import { TEAM_COLORS } from '../common/teams';
 import { Lights } from '../common/lights';
@@ -132,19 +132,26 @@ export class Renderer {
     var buildTile = buildParams.get('tile');
     var showBuildTile = buildParams.get('show');
 
+    var tileColors = {
+      [ROAD]: [0.6, 0.9, 0.65, 1],
+      [HOME]: [0.92,0.9,0.9,1],
+      [WORK]: [1.00,0.81,0.23, 0.9],
+      [AQUA]: [0.70, 0.95, 0.95, 1],
+      [TREE]: [0.6, 0.9, 0.65, 1],
+      [NONE]: [0.6, 0.9, 0.65, 1],
+      [ROCK]: [0.6, 0.9, 0.65, 1]
+    };
+
     Tiles.find().forEach(tile => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       _v3_0[2] = 0;
 
-      var color = [0.92,0.9,0.9,1];
+      var color = vec4.set(_v4_0, ...tileColors[tile.type]);
 
-      if (tile.type == WORK) {
-        color = [0, 1, 0, 1];
-      } else if (tile.type == HOME) {
+      if (tile.type == HOME) {
         color = vec4.set(_v4_0, ...TEAM_COLORS[tile.teamId]);
-        color[3] = 0.7;
+        color[3] = 0.9;
       } else if (tile.type == AQUA) {
-        color = [0.70, 0.9, 0.95, 1];
         vec3.set(_v3_1, 0, 0, -0.03);
         vec3.add(_v3_0, _v3_0, _v3_1);
       }
@@ -154,9 +161,9 @@ export class Renderer {
       }
 
       if (canBuildHome(tile) || canBuildRoad(tile)) {
-        color[0] += 0.05;
-        color[1] += 0.05;
-        color[2] += 0.05;
+        color[0] += 0.1;
+        color[1] += 0.1;
+        color[2] += 0.1;
       }
 
       if (showBuildTile && buildTile._id === tile._id) {
@@ -231,7 +238,7 @@ export class Renderer {
     });
 
     office.bind(shader);
-    shader.uniforms.color = [0.9, 1, 0.9, 1];
+    shader.uniforms.color = [1.00,0.81,0.23, 1];
     Tiles.find({ type: WORK }).forEach((tile, i) => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
@@ -249,7 +256,7 @@ export class Renderer {
     });
 
     rock.bind(shader);
-    shader.uniforms.color = [0.5, 0.5, 0.5, 1];
+    shader.uniforms.color = [0.9, 1, 0.92, 1];
     Tiles.find({ type: ROCK }).forEach((tile, i) => {
       this.hexgrid.center(_v3_0, tile.x, tile.y);
       var world = mat4.fromTranslation(this.world, _v3_0);
