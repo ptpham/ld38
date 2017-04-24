@@ -1,8 +1,9 @@
 
 import { vec3, mat4 } from 'gl-matrix';
 import { Meteor } from 'meteor/meteor';
-import { Tiles, ROAD } from '../common/tiles';
+import { Tiles, ROAD, WORK } from '../common/tiles';
 import { Lights } from '../common/lights';
+import { harvestParams } from './harvest';
 import HexGrid from '../common/hexgrid';
 import _ from 'lodash';
 
@@ -69,9 +70,9 @@ export class Control {
     var highlight = this.hexgrid.lookup(this.renderer.highlight,
       mouseHit[0], mouseHit[1]);
 
+    var tile = Tiles.findOne({ x: highlight[0], y: highlight[1] });
     var light = Lights.findOne({ x: highlight[0], y: highlight[1] });
     if (light != null) {
-      var tile = Tiles.findOne({ x: highlight[0], y: highlight[1] });
       var best = Infinity, orientation = null;
       for (var otherId of tile.paths) {
         var other = Tiles.findOne({ _id: otherId });
@@ -87,6 +88,18 @@ export class Control {
         this.renderer.proposeLight = orientation;
       } else {
         this.renderer.proposeLight = null;
+      }
+    }
+
+    if (tile != null) {
+      let team = localStorage.getItem('team');
+
+      if (tile.type == WORK) {
+        harvestParams.set('clientX', e.clientX);
+        harvestParams.set('clientY', e.clientY);
+        harvestParams.set('money', _.get(tile, 'resources.' + team) || 0);
+      } else {
+        harvestParams.set('money', -1);
       }
     }
 
