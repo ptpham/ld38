@@ -34,7 +34,7 @@ export function findDistances() {
 
   tiles.forEach((tile) => {
     const i = lookup(tile.index);
-    const adjRoads = tile.paths.map(id => Tiles.findOne(id));
+    const adjRoads = (tile.paths || []).map(id => Tiles.findOne(id));
     aMatrix.set(i, i, 0);
     adjRoads.forEach((other) => {
       const ai = lookup(other.index);

@@ -188,7 +188,7 @@ export class Renderer {
 
     rect.bind(shader);
     Tiles.find({ type: ROAD }).forEach(tile => {
-      const adjTiles = tile.paths.map(id => Tiles.findOne(id));
+      const adjTiles = (tile.paths || []).map(id => Tiles.findOne(id));
       adjTiles.forEach(tileA => {
         if (tileA == null) return;
         const orient = HexGrid.orientation(tile.x, tile.y, tileA.x, tileA.y);

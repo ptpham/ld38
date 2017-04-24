@@ -6,31 +6,57 @@ import HexGrid from '../common/hexgrid';
 import { createLight } from './lighting';
 import { cantorZ } from '../common/pairing';
 
-export function build({ x, y, type }, stop) {
+function pushPath(src, dst) {
+  return Tiles.update({ _id: src._id }, { $push: { 'paths': dst._id },
+    $inc: { roads: 1 } }, () => {
+      checkStopLight(src._id);
+  });
+}
+
+function checkStopLight(tileId) {
+  var tile = Tiles.findOne({ _id: tileId });
+  if (tile.type != ROAD) return;
+
+  if (tile.roads == 3) {
+    var adjacentRoads = Tiles.find({ _id: { $in: tile.paths }, type: ROAD }).fetch();
+    var closedTile = Tiles.findOne({ _id: _.sample(adjacentRoads)._id });
+
+    var { x, y } = tile;
+    var closed = HexGrid.orientation(x, y, closedTile.x, closedTile.y);
+    createLight({ x, y, closed });
+  }
+}
+
+export function updatePaths(tile, adjacent) {
+  if (tile == null) return;
+  if (tile.type != WORK && tile.type != HOME && tile.type != ROAD) return;
+  if (tile.type != ROAD && _.get(tile, 'paths.length') > 0) return;
+
+  adjacent = _.shuffle(Array.from(adjacent));
+  for (var other of adjacent) {
+    if (other.type == ROAD) {
+      pushPath(tile, other);
+      pushPath(other, tile);
+      if (tile.type != ROAD) return;
+    }
+  }
+}
+
+export function build({ x, y, type }) {
   const gameId = getGameId();
   var index = index || cantorZ(x, y);
 
   var adjacentIndexes = HexGrid.shifts.map(shift =>
     cantorZ(x + shift[0], y + shift[1]));
-  var adjacentTiles = Tiles.find({ gameId, index: { $in: adjacentIndexes } }).fetch();
-  var pathables = _.filter(adjacentTiles, tile =>
-    tile.type == ROAD || tile.type == WORK || tile.type == HOME);
-  var adjacentRoads = _.filter(pathables, tile => tile.type == ROAD);
-  if (type == ROAD) {
-    if (adjacentRoads.length == 3) {
-      var closedTile = Tiles.findOne({ _id: _.sample(adjacentRoads)._id });
-      var closed = HexGrid.orientation(x, y, closedTile.x, closedTile.y);
-      createLight({ x, y, closed });
-    }
-    if (adjacentRoads.length > 3) return;
-  }
+  var adjacentTiles = Tiles.find({ gameId, type: { $in: [WORK, ROAD, HOME] },
+    index: { $in: adjacentIndexes } }).fetch();
+  var adjacentRoads = _.filter(adjacentTiles, tile => tile.type == ROAD);
+  if (type == ROAD && adjacentRoads.length > 3) return;
 
-  var roads = adjacentRoads.length;
-  var paths = pathables.map(x => x._id);
-
-  var result = Tiles.upsert({ x, y, gameId }, { $set: { type, paths, roads, index } });
-  if (!stop) _.each(adjacentTiles, tile => build(tile, true));
-  return result;
+  return Tiles.upsert({ x, y, gameId }, { $set: { type, index } }, err => {
+    var tile = Tiles.findOne({ gameId, index });
+    updatePaths(tile, adjacentTiles);
+  });
 }
 
 export function buildRoad(x, y, check) {
@@ -67,6 +93,7 @@ export function generateMap(width, height) {
   buildRoad(center[0] - 1, center[1] + 1);
   buildWork(center[0] + 1, center[1] + 1);
   buildHome(center[0] - 1, center[1] - 1, 0);
+  buildHome(center[0] + 1, center[1] - 1, 0);
   buildHome(center[0] - 1, center[1] + 2, 1);
   return Tiles;
 }
