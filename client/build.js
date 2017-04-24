@@ -10,20 +10,23 @@ Template.build.helpers({
   buildable() {
     const buildable = [];
     const tile = buildParams.get('tile');
-    if (canBuildHome(tile)) buildable.push({ id: HOME, name: 'Home' });
-    if (canBuildRoad(tile)) buildable.push({ id: ROAD, name: 'Road' });
+    if (tile) {
+      if (canBuildHome(tile)) buildable.push({ id: HOME, name: 'Home' });
+      if (canBuildRoad(tile)) buildable.push({ id: ROAD, name: 'Road' });
+    }
     return buildable;
   },
   isHidden() {
     const show = buildParams.get('show');
     const tile = buildParams.get('tile');
-    const canBuild = canBuildHome(tile) || canBuildRoad(tile);
+    const canBuild = tile && (canBuildHome(tile) || canBuildRoad(tile));
     return canBuild && show ? 'visible' : '';
   }
 });
 
 Template.build.events({
   'click button': function(event) {
+    event.stopImmediatePropagation();
     const buildType = event.target.id;
     const tile = buildParams.get('tile');
     if (buildType === HOME) {
@@ -34,7 +37,8 @@ Template.build.events({
     }
     buildParams.set('show', 0);
   },
-  'click': function() {
+  'click': function(event) {
+    event.stopImmediatePropagation();
     buildParams.set('show', 0);
   }
 });
