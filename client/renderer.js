@@ -3,12 +3,11 @@ import { flatShader } from './shaders';
 import { Camera } from './camera';
 import createGeometry from 'gl-geometry';
 import { vec3, vec4, mat4 } from 'gl-matrix';
-import { Tiles, canBuildHome, canBuildRoad,
-  ROAD, WORK, HOME, TREE, NONE, AQUA, ROCK } from '../common/tiles';
+import { Tiles, ROAD, WORK, HOME, TREE, NONE, AQUA, ROCK } from '../common/tiles';
 import { Cars } from '../common/cars';
 import { TEAM_COLORS } from '../common/teams';
 import { Lights } from '../common/lights';
-import { buildParams } from './build';
+import { buildParams, buildable } from './build';
 import Lanes from './lanes';
 import HexGrid from '../common/hexgrid';
 import { Mesh } from 'webgl-obj-loader';
@@ -160,7 +159,7 @@ export class Renderer {
         color[0] = 1;
       }
 
-      if (canBuildHome(tile) || canBuildRoad(tile)) {
+      if (buildable(tile)) {
         color[0] += 0.1;
         color[1] += 0.1;
         color[2] += 0.1;

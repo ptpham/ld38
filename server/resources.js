@@ -14,6 +14,6 @@ export function harvestTile(tileId, teamId) {
   var gameId = getGameId();
   set['resources.' + teamId] = 0;
   Tiles.update({ _id: tile._id }, { $set: set });
-  Teams.update({ gameId, index: +teamId }, { $inc: { resources: amount } });
+  Teams.update({ gameId, index: teamId }, { $inc: { resources: amount } });
 }
 

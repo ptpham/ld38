@@ -29,7 +29,10 @@
   <div id="build-overlay" class="{{isHidden}}">
     <div>
       {{#each buildable}}
-        <button id="{{id}}">{{name}}</button>
+        <div class="build">
+          <button id="{{id}}">Build a {{name}}</button>
+          <span>Cost: {{ cost }}</span>
+        </div>
       {{/each}}
     </div>
   </div>
