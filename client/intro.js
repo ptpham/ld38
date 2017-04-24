@@ -1,7 +1,7 @@
 import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
 import { TEAM_COLORS } from '../common/teams';
-import { HOME, ROAD, TILE_COSTS } from '../common/tiles';
+import { HOME, ROAD, TILE_COSTS, MAX_RESOURCES } from '../common/tiles';
 
 export const introParams = new ReactiveDict();
 introParams.set('hide', !!localStorage.getItem('intro'));
@@ -29,6 +29,7 @@ Template.intro.helpers({
     const str = color.slice(0, 3).map(c => Math.round(c*255)).join(',');
     return `rgb(${str})`;
   },
+  maxTax() { return MAX_RESOURCES; },
   homeCost() { return TILE_COSTS[HOME]; },
   roadCost() { return TILE_COSTS[ROAD]; }
 });

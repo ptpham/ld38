@@ -10,7 +10,7 @@ export const ROCK = 'ROCK';
 export const AQUA = 'AQUA';
 export const NONE = 'NONE';
 
-export const MAX_RESOURCES = 10;
+export const MAX_RESOURCES = 5;
 export const BUILDABLE_SET = {TREE, ROCK, AQUA, NONE};
 export const TILE_COSTS = {
   [HOME]: 10,
