@@ -246,3 +246,7 @@ button:hover {
   border: 1px solid white;
 }
 
+*::selection {
+  background: none;
+}
+
