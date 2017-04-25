@@ -14,16 +14,24 @@ export function assignWork(workTiles, car) {
   car.workTileId = work._id;
 }
 
+export function unassignWork(car) {
+  if (car.workTileId == null) return;
+  Cars.update({ _id: car._id }, {
+    $set: { prevWorkTileId: car.workTileId },
+    $unset: { workTileId: '' } });
+}
+
 export function assignDestination(car) {
   var dstTileId = null;
   if (car.currentTileId == car.homeTileId && car.workTileId != null) {
     dstTileId = car.workTileId;
   }
-  if (car.currentTileId == car.workTileId) {
+  if (car.currentTileId == car.workTileId ||
+      car.currentTileId == car.prevWorkTileId) {
     dstTileId = car.homeTileId;
     var inc = {};
     inc['resources.' + car.teamId] = 1;
-    Tiles.update({ _id: car.workTileId }, { $inc: inc });
+    Tiles.update({ _id: car.currentTileId }, { $inc: inc });
   }
   if (dstTileId == null) return;
   car.dstTileId = dstTileId;

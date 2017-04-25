@@ -6,7 +6,9 @@ import HexGrid from '../common/hexgrid';
 import { createLight } from './lighting';
 import { cantorZ } from '../common/pairing';
 import { Teams } from '../common/teams';
+import { Cars } from '../common/cars';
 import { Meteor } from 'meteor/meteor';
+import { unassignWork } from './automata';
 
 function pushPath(src, dst) {
   var bothRoad = src.type == ROAD && dst.type == ROAD;
@@ -132,7 +134,10 @@ export function expandWork() {
     })
   });
 
-  if (found != null) buildWork(found.x, found.y);
+  if (found != null) {
+    buildWork(found.x, found.y);
+    Cars.find({ gameId }).forEach(car => unassignWork(car));
+  }
 }
 
 function expandRoads() {
