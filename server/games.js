@@ -6,7 +6,7 @@ import { resetPathingState } from './pathing';
 import { generateMap } from './building';
 import { Games } from '../common/games';
 
-export const GAME_TIME = 5*60*1000;
+export const GAME_TIME = 60*60*1000;
 
 let gameId = null;
 var users = 0;

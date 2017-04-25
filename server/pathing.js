@@ -10,12 +10,24 @@ export const pathing = { };
 
 export function resetPathingState() {
   pathing.cMatrix = new Map();
+  pathing.cMatrixSaved = new Map();
   pathing.traversable = new Set();
   pathing.mapDown = new Map();
   pathing.mapUp = null;
   pathing.dMatrix = null;
 }
 resetPathingState();
+
+export function updateCMatrix(x0, y0, x1, y1, time) {
+  var z0 = cantorZ(x0, y0);
+  var z1 = cantorZ(x1, y1);
+  var entry = cantorZ(z0, z1);
+  var { cMatrix } = pathing;
+  current = cMatrix.get(entry) || 1;
+  var alpha = 0.1;
+  var averaged = current*(1 - alpha) + alpha*time;
+  cMatrix.set(entry, averaged);
+}
 
 export function findDistances() {
   const tiles = Tiles.find({ gameId: getGameId(),
@@ -44,7 +56,6 @@ export function findDistances() {
     adjRoads.forEach((other) => {
       const ai = lookup(other.index);
       aMatrix.set(i, ai, cMatrix.get(cantorZ(tile.index, other.index)) || 1);
-      aMatrix.set(ai, i, cMatrix.get(cantorZ(other.index, tile.index)) || 1);
       traversable.add(cantorZ(i, ai));
     });
   });
@@ -53,11 +64,12 @@ export function findDistances() {
   pathing.mapDown = mapDown;
   pathing.dMatrix = floydWarshall(aMatrix);
   pathing.traversable = traversable;
+  pathing.cMatrixSaved = _.cloneDeep(cMatrix);
   return pathing;
 }
 
 export function findNextTile(x, y, xG, yG, xF, yF) {
-  var { cMatrix, dMatrix, mapDown, mapUp, traversable } = pathing;
+  var { cMatrixSaved, dMatrix, mapDown, mapUp, traversable } = pathing;
 
   let next = null;
   const start = mapDown.get(cantorZ(x, y));
@@ -67,20 +79,23 @@ export function findNextTile(x, y, xG, yG, xF, yF) {
   const min = dMatrix.get(start, goal);
   if (min === -1) return;
 
+  var best = Infinity, found = null;
   var from = xF == null || yF == null ? null : cantorZ(xF, yF);
   for (var shift of HexGrid.shifts) {
     var adj = cantorZ(x + shift[0], y + shift[1]);
     if (from != null && from == adj) continue; // ignore where it came from
-    var edgeCost = cMatrix.get(cantorZ(start, adj)) || 1;
+    var edgeCost = cMatrixSaved.get(cantorZ(start, adj)) || 1;
     if (!mapDown.has(adj)) continue;
     var adjDown = mapDown.get(adj);
     if (!traversable.has(cantorZ(start, adjDown))) continue;
     var farCost = dMatrix.get(adjDown, goal);
     if (farCost == -1) continue;
     const sumCost = edgeCost + farCost;
-    if (sumCost == min) {
-      next = Tiles.findOne({ gameId: getGameId(), index: adj});
-      if (next != null) return next;
+    if (sumCost < best) {
+      best = sumCost;
+      found = adj;
     }
   }
+
+  if (found != null) return Tiles.findOne({ gameId: getGameId(), index: found });
 }
