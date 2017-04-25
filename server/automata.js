@@ -26,13 +26,10 @@ export function assignDestination(car) {
   if (car.currentTileId == car.homeTileId && car.workTileId != null) {
     dstTileId = car.workTileId;
   }
-  if ((car.currentTileId == car.workTileId ||
-      car.currentTileId == car.prevWorkTileId)
-      && (car.dstTileId == car.currentTileId)) {
+
+  if (car.currentTileId == car.workTileId
+    || car.currentTileId == car.prevWorkTileId) {
     dstTileId = car.homeTileId;
-    var inc = {};
-    inc['resources.' + car.teamId] = 1;
-    Tiles.update({ _id: car.currentTileId }, { $inc: inc });
   }
   if (dstTileId == null) return;
   car.dstTileId = dstTileId;
@@ -113,16 +110,22 @@ export function simulate() {
     moveCar(car, routeCar(car));
     car.await++;
 
-    if (car.transition) {
-      var currentTile = Tiles.findOne({ _id: car.currentTileId });
-      var lastTile = Tiles.findOne({ _id: car.lastTileId });
-      if (lastTile != null) {
-        pathing.updateCMatrix(currentTile.x, currentTile.y, lastTile.x, lastTile.y, car.lastAwait);
+    if (checkSlotOpen(car.currentTileId, car.orientation, car.leaving)) {
+      if (car.transition) {
+        var currentTile = Tiles.findOne({ _id: car.currentTileId });
+        var lastTile = Tiles.findOne({ _id: car.lastTileId });
+        if (lastTile != null) {
+          pathing.updateCMatrix(currentTile.x, currentTile.y, lastTile.x, lastTile.y, car.lastAwait);
+        }
+
+        if (car.currentTileId == car.workTileId
+            || car.currentTileId == car.prevWorkTileId) {
+          var inc = {};
+          inc['resources.' + car.teamId] = 1;
+          Tiles.update({ _id: car.currentTileId }, { $inc: inc });
+        }
         delete car.transition;
       }
-    }
-
-    if (checkSlotOpen(car.currentTileId, car.orientation, car.leaving)) {
       Cars.update({ _id: car._id, gameId  }, { $set: car });
     }
   }

@@ -13,6 +13,7 @@ Template.harvest.helpers({
   },
   leftPos() { return harvestParams.get('clientX'); },
   topPos() { return harvestParams.get('clientY'); },
+  maxTax() { return MAX_RESOURCES; },
   resourcesEarned() {
     var tile = Tiles.findOne({ _id: harvestParams.get('tileId') });
     var teamId = localStorage.getItem('team');
