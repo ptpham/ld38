@@ -6,13 +6,14 @@ import HexGrid from '../common/hexgrid';
 import { createLight } from './lighting';
 import { cantorZ } from '../common/pairing';
 import { Teams } from '../common/teams';
+import { Meteor } from 'meteor/meteor';
 
 function pushPath(src, dst) {
   var bothRoad = src.type == ROAD && dst.type == ROAD;
   var singleUnconnected = dst.type == ROAD
     && (src.type == WORK || src.type == HOME)
     && (src.paths == null || src.paths.length < 1);
-  
+
   if (src.type == ROAD) {
     Tiles.update({ _id: dst._id }, { $inc: { roads: 1 } }, () => {
       checkStopLight(dst._id);
@@ -102,9 +103,12 @@ export function generateMap(width, height) {
   buildRoad(center[0] + 1, center[1]);
   buildRoad(center[0], center[1] - 1);
   buildRoad(center[0] - 1, center[1] + 1);
-  buildWork(center[0] - 2, center[1] + 2);
-  buildHome(center[0] + 1, center[1] + 1, 0);
-  buildHome(center[0] - 1, center[1] - 1, 1);
+
+  Meteor.setTimeout(() => {
+    buildWork(center[0] - 2, center[1] + 2);
+    buildHome(center[0] + 1, center[1] + 1, 0);
+    buildHome(center[0] - 1, center[1] - 1, 1);
+  }, 500);
   return Tiles;
 }
 
