@@ -73,6 +73,9 @@ function moveCar(car, route) {
   car.lastTileId = route.next._id == car.dstTileId ? null : car.currentTileId;
   car.orientation = opposite;
   car.currentTileId = route.next._id;
+  car.lastAwait = car.await;
+  car.await = 0;
+  car.transition = true;
   car.leaving = false;
   return car;
 }
@@ -82,7 +85,7 @@ export function createCar(homeTile) {
   var homeTileId = homeTile._id;
   var currentTileId = homeTileId;
   return Cars.upsert({ homeTileId, gameId },
-    { $set: { currentTileId, teamId: homeTile.teamId } });
+    { $set: { currentTileId, teamId: homeTile.teamId, await: 0 } });
 }
 
 export function simulate() {
@@ -99,6 +102,16 @@ export function simulate() {
     if (car.workTileId == null) assignWork(workTiles, car);
     assignDestination(car);
     moveCar(car, routeCar(car));
+    car.await++;
+
+    if (car.transition) {
+      var currentTile = Tiles.findOne({ _id: car.currentTileId });
+      var lastTile = Tiles.findOne({ _id: car.lastTileId });
+      if (lastTile != null) {
+        pathing.updateCMatrix(currentTile.x, currentTile.y, lastTile.x, lastTile.y, car.lastAwait);
+        delete car.transition;
+      }
+    }
 
     if (checkSlotOpen(car.currentTileId, car.orientation, car.leaving)) {
       Cars.update({ _id: car._id, gameId  }, { $set: car });

@@ -22,7 +22,8 @@ function pushPath(src, dst) {
       () => { checkStopLight(dst._id); });
     Tiles.update({ _id: src._id }, { $push: { 'paths': dst._id } },
       () => { checkStopLight(src._id); });
-    src.paths = (src.paths || []).push(dst._id);
+    src.paths = src.paths || [];
+    src.paths.push(dst._id);
   }
 }
 
