@@ -14,32 +14,32 @@ function pushPath(src, dst) {
     && (src.paths == null || src.paths.length < 1);
   
   if (src.type == ROAD) {
-    Tiles.update({ _id: dst._id }, { $inc: { roads: 1 } });
+    Tiles.update({ _id: dst._id }, { $inc: { roads: 1 } }, () => {
+      checkStopLight(dst._id);
+    });
   }
 
   if (singleUnconnected || bothRoad) {
-    Tiles.update({ _id: dst._id }, { $push: { 'paths': src._id } },
-      () => { checkStopLight(dst._id); });
-    Tiles.update({ _id: src._id }, { $push: { 'paths': dst._id } },
-      () => { checkStopLight(src._id); });
+    Tiles.update({ _id: dst._id }, { $push: { 'paths': src._id } });
+    Tiles.update({ _id: src._id }, { $push: { 'paths': dst._id } });
     src.paths = src.paths || [];
     src.paths.push(dst._id);
   }
 }
 
+function addStopLight(tile) {
+  var adjacentRoads = Tiles.find({ _id: { $in: tile.paths }, type: ROAD }).fetch();
+  var closedTile = Tiles.findOne({ _id: _.sample(adjacentRoads)._id });
+
+  var { x, y } = tile;
+  var closed = HexGrid.orientation(x, y, closedTile.x, closedTile.y);
+  createLight({ x, y, closed });
+}
+
 function checkStopLight(tileId) {
   var tile = Tiles.findOne({ _id: tileId });
-  if (tile.type != ROAD) return;
-  const check = tile.paths ? tile.paths.length == 3 && tile.roads == 3 : tile.roads == 3;
-
-  if (check) {
-    var adjacentRoads = Tiles.find({ _id: { $in: tile.paths }, type: ROAD }).fetch();
-    var closedTile = Tiles.findOne({ _id: _.sample(adjacentRoads)._id });
-
-    var { x, y } = tile;
-    var closed = HexGrid.orientation(x, y, closedTile.x, closedTile.y);
-    createLight({ x, y, closed });
-  }
+  if (tile == null || tile.type != ROAD) return;
+  if (tile.roads == 3) addStopLight(tile);
 }
 
 export function updatePaths(tile, adjacent) {
@@ -65,6 +65,7 @@ export function build({ x, y, type }) {
   return Tiles.upsert({ x, y, gameId }, { $set: { type, index } }, err => {
     var tile = Tiles.findOne({ gameId, index });
     updatePaths(tile, allAdjacent);
+    checkStopLight(tile);
   });
 }
 
@@ -100,7 +101,8 @@ export function generateMap(width, height) {
   buildRoad(center[0], center[1]);
   buildRoad(center[0] + 1, center[1]);
   buildRoad(center[0], center[1] - 1);
-  buildWork(center[0] - 1, center[1] + 1);
+  buildRoad(center[0] - 1, center[1] + 1);
+  buildWork(center[0] - 2, center[1] + 2);
   buildHome(center[0] + 1, center[1] + 1, 0);
   buildHome(center[0] - 1, center[1] - 1, 1);
   return Tiles;
