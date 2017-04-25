@@ -100,10 +100,9 @@ export function generateMap(width, height) {
   buildRoad(center[0], center[1]);
   buildRoad(center[0] + 1, center[1]);
   buildRoad(center[0], center[1] - 1);
-  buildRoad(center[0] - 1, center[1] + 1);
-  buildWork(center[0] + 1, center[1] + 1);
-  buildHome(center[0] - 1, center[1] - 1, 0);
-  buildHome(center[0] - 1, center[1] + 2, 1);
+  buildWork(center[0] - 1, center[1] + 1);
+  buildHome(center[0] + 1, center[1] + 1, 0);
+  buildHome(center[0] - 1, center[1] - 1, 1);
   return Tiles;
 }
 
@@ -112,7 +111,7 @@ export function expandWork() {
   var population = Tiles.find({ gameId, type: HOME }).count();
   var workCount = Tiles.find({ gameId, type: WORK }).count();
 
-  if (workCount > population / 2) return;
+  if (workCount >= population / 2) return;
   var roads = Tiles.find({ gameId, type: ROAD }).fetch();
   var found = null;
   
