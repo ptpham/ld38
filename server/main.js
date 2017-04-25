@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Tiles, TILE_COSTS, HOME, ROAD,
-  canBuyRoad, canBuyHome} from '../common/tiles';
+  canBuyRoad, canBuyHome, homeCost} from '../common/tiles';
 import { Lights } from '../common/lights';
 import { Cars } from '../common/cars';
 import { Teams } from '../common/teams';
@@ -28,14 +28,14 @@ Meteor.startup(() => {
       var gameId = getGameId();
       const { resources, homes } = Teams.findOne({ gameId, index });
       if (!canBuyHome(homes, resources)) return;
-      Teams.update({ gameId, index }, { $set: { resources: resources - TILE_COSTS[HOME] } });
+      Teams.update({ gameId, index }, { $inc: { resources: -homeCost(homes) } });
       buildHome(x, y, index, true);
     },
     buildRoad: (x, y, index) => {
       var gameId = getGameId();
       const resources = Teams.findOne({ gameId, index }).resources;
       if (!canBuyRoad(resources)) return;
-      Teams.update({ gameId, index }, { $set: { resources: resources - TILE_COSTS[ROAD] } });
+      Teams.update({ gameId, index }, { $inc: { resources: -TILE_COSTS[ROAD] } });
       buildRoad(x, y, true);
     },
     harvestTile,
