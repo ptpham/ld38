@@ -82,7 +82,7 @@ export function createCar(homeTile) {
   var homeTileId = homeTile._id;
   var currentTileId = homeTileId;
   return Cars.upsert({ homeTileId, gameId },
-    { $set: { currentTileId, teamId: homeTile.teamId } });
+    { $set: { currentTileId, teamId: homeTile.teamId, orientation: 0, leaving: true } });
 }
 
 export function simulate() {
@@ -99,7 +99,6 @@ export function simulate() {
     if (car.workTileId == null) assignWork(workTiles, car);
     assignDestination(car);
     moveCar(car, routeCar(car));
-
     if (checkSlotOpen(car.currentTileId, car.orientation, car.leaving)) {
       Cars.update({ _id: car._id, gameId  }, { $set: car });
     }

@@ -24,7 +24,7 @@ export default class Lanes {
     var last = this.lastTransforms.get(id);
     if (last == null) {
       last = mat4.clone(result);
-      this.lastTransforms.set(id, last);  
+      this.lastTransforms.set(id, last);
     } else {
       var alpha = 0.1;
       mat4.multiplyScalar(last, last, 1 - alpha);
