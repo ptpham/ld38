@@ -26,10 +26,9 @@ export function assignDestination(car) {
   if (car.currentTileId == car.homeTileId && car.workTileId != null) {
     dstTileId = car.workTileId;
   }
-  if (car.currentTileId == car.workTileId ||
-      car.currentTileId == car.prevWorkTileId 
-      && (car.dstTileId == car.workTileId ||
-          car.dstTileId == car.prevWorkTileId)) {
+  if ((car.currentTileId == car.workTileId ||
+      car.currentTileId == car.prevWorkTileId)
+      && (car.dstTileId == car.currentTileId)) {
     dstTileId = car.homeTileId;
     var inc = {};
     inc['resources.' + car.teamId] = 1;
