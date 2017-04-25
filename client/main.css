@@ -246,7 +246,7 @@ button:hover {
   border: 1px solid white;
 }
 
-*::selection {
+::selection {
   background: none;
 }
 
